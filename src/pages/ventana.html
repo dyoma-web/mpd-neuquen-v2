@@ -1,0 +1,48 @@
+---
+title: Ventana flotante en el sitio del MPD
+description: Cómo se vería Justina MPD instalada como ventana flotante en el sitio actual de la Defensa.
+page: Widget
+motor: justina
+---
+<div class="pg">
+<div style="background:#fff;border-bottom:1px solid #d8e1e5">
+<div style="max-width:1240px;margin:0 auto;padding:16px 32px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px">
+<img src="assets/img/justina/logo-mpd.png" alt="Ministerio Público de la Defensa · Provincia del Neuquén" width="165" height="50" style="display:block;height:auto">
+<span style="margin-left:auto;display:flex;flex-wrap:wrap;gap:10px 24px;font-size:15px;color:#4c606b"><span>Institucional</span><span>Defensorías</span><span>Servicios</span><span>Novedades</span><span>Contacto</span></span>
+</div>
+</div>
+<main id="contenido" style="max-width:1240px;margin:0 auto;padding:28px 32px 140px;display:flex;flex-direction:column;gap:22px">
+<span style="align-self:flex-start;padding:3px 10px;border-radius:4px;background:#fff7e6;color:#5d4514;font-size:13.5px;font-weight:700">Representación esquemática del sitio actual del MPD</span>
+<div class="blk" style="height:260px;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:40px">
+<span class="bar" style="width:46%;height:30px"></span>
+<span class="bar" style="width:62%;height:14px"></span>
+<span class="bar" style="width:54%;height:14px"></span>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px;padding:24px 28px;border-radius:11px;background:#163c4d;color:#fff">
+<div style="flex:1 1 320px;display:flex;flex-direction:column;gap:4px">
+<span style="font-family:Roboto,Arial,sans-serif;font-weight:700;font-size:22px;letter-spacing:-.025em">¿Con quién puedo hablar?</span>
+<span style="color:#eaf2f5">Justina MPD te orienta para encontrar una defensoría, entender un aviso o conocer tus derechos.</span>
+</div>
+<button type="button" class="demo-banner-btn" data-chat=""><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-3 2v-8.5A9.5 9.5 0 0 1 11.5 4H14a7 7 0 0 1 7 7.5Z"></path><path d="M7 11h.01M11.5 11h.01M16 11h.01" stroke-width="2.7"></path></svg> Consultar a Justina MPD</button>
+<span style="flex-basis:100%;font-size:13.5px;color:#d5e7ed">Alternativa mínima: este banner con un enlace a la <a href="asistente.html" style="color:#fff">página de Justina MPD</a>, si no se instala la ventana flotante.</span>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:18px">
+<div class="blk" style="height:190px;padding:24px;display:flex;flex-direction:column;gap:12px"><span class="bar" style="width:60%;height:18px"></span><span class="bar" style="width:90%;height:11px"></span><span class="bar" style="width:80%;height:11px"></span></div>
+<div class="blk" style="height:190px;padding:24px;display:flex;flex-direction:column;gap:12px"><span class="bar" style="width:52%;height:18px"></span><span class="bar" style="width:86%;height:11px"></span><span class="bar" style="width:70%;height:11px"></span></div>
+<div class="blk" style="height:190px;padding:24px;display:flex;flex-direction:column;gap:12px"><span class="bar" style="width:66%;height:18px"></span><span class="bar" style="width:88%;height:11px"></span><span class="bar" style="width:76%;height:11px"></span></div>
+</div>
+
+<div class="blk" style="padding:20px 24px;display:flex;flex-direction:column;gap:8px">
+<strong style="font-family:Roboto,Arial,sans-serif">Instalación en el sitio real</strong>
+<span style="font-size:15px;color:#4c606b">El equipo informático pega una sola línea en el sitio. La ventana se dibuja en un componente aislado: no cambia los estilos ni el contenido de la plataforma existente, no usa cookies y no se conecta a ningún servidor.</span>
+<code style="display:block;padding:12px 14px;border-radius:8px;background:#1c3643;color:#eaf1f3;overflow-x:auto;font-size:13.5px">&lt;script src="<span data-ventana-src>https://[dominio]/assets/js/justina-ventana.js</span>" defer&gt;&lt;/script&gt;</code>
+<span style="font-size:15px;color:#4c606b">Cualquier botón del sitio puede abrir una consulta con el atributo <code>data-chat</code>, como el del banner de arriba. En esta pantalla la ventana es la real: el botón «Justina MPD» está abajo a la derecha.</span>
+</div>
+</main>
+</div>
+<script>
+  // Muestra la dirección real del archivo de instalación.
+  document.querySelector('[data-ventana-src]').textContent = new URL('assets/js/justina-ventana.js', location.href).href;
+</script>

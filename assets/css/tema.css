@@ -1,0 +1,67 @@
+/* ==========================================================================
+   Justina MPD · piezas comunes a todas las pantallas del prototipo
+   - Barra del prototipo (arriba): aviso de versión y menú de pantallas.
+   - Cabecera y pie institucionales para las pantallas de documentación.
+   Las clases llevan prefijo (proto-, mpd-) para no chocar con justina.css.
+   ========================================================================== */
+
+/* ---------- Barra del prototipo ---------- */
+.proto-bar{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;gap:4px 16px;min-height:40px;padding:4px clamp(14px,3vw,32px);background:#fff7e6;color:#382e15;border-bottom:1px solid #d4bf90;font:400 13.5px/1.35 "Open Sans",Arial,sans-serif;letter-spacing:0;word-spacing:0}
+.proto-bar-t{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;min-width:0}
+.proto-bar-t strong{font-weight:700}
+.proto-btn{flex:none;display:inline-flex;align-items:center;gap:7px;min-height:32px;padding:0 13px;border-radius:7px;border:1px solid #71420e;background:#fff;color:#5d3608;font:700 13.5px/1.2 "Open Sans",Arial,sans-serif;cursor:pointer}
+.proto-btn:hover{background:#fdeed0}
+.proto-btn svg{width:15px;height:15px;flex:none}
+.proto-btn:focus-visible,.proto-panel a:focus-visible,.proto-close:focus-visible{outline:3px solid #a94c04;outline-offset:2px}
+.proto-panel{position:absolute;right:clamp(14px,3vw,32px);top:calc(100% + 6px);width:min(350px,calc(100vw - 28px));max-height:min(78vh,640px);overflow:auto;padding:18px 18px 12px;border-radius:12px;background:#173947;color:#fff;font:400 15px/1.45 "Open Sans",Arial,sans-serif;box-shadow:0 12px 32px rgba(19,59,48,.3)}
+.proto-panel[hidden]{display:none}
+.proto-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}
+.proto-title{font:700 16px/1.25 Roboto,Arial,sans-serif;margin:0;color:#fff}
+.proto-note{margin:4px 0 10px;font-size:13.5px;color:#d5e7ed}
+.proto-close{flex:none;min-width:36px;min-height:36px;border-radius:6px;border:1px solid #80a8bb;background:transparent;color:#fff;font-size:18px;cursor:pointer}
+.proto-group{margin:12px 0 4px;font:700 12.5px/1.3 "Open Sans",Arial,sans-serif;color:#c5e8ee;letter-spacing:.04em}
+.proto-panel a{display:block;padding:8px 10px;border-radius:6px;color:#fff !important;text-decoration:none;font-size:15px;font-weight:400}
+.proto-panel a:hover{background:#145e77}
+.proto-panel a[aria-current="page"]{background:#276880;font-weight:700}
+.proto-embed .proto-bar{display:none !important}
+@media(max-width:560px){.proto-bar-t span{display:none}}
+@media print{.proto-bar{display:none}}
+
+/* La barra queda fija arriba: los saltos internos dejan ese espacio libre. */
+html{scroll-padding-top:4.5rem}
+
+/* ---------- Cabecera y pie institucionales ---------- */
+.mpd-in{width:min(calc(100% - clamp(32px,8vw,120px)),1264px);margin-inline:auto;display:flex;align-items:center;justify-content:space-between;gap:10px 24px}
+.mpd-utility{background:#173947;color:#f0f6f2;font:400 .8rem/1.4 "Open Sans",Arial,sans-serif;letter-spacing:.018em}
+.mpd-utility .mpd-in{min-height:34px}
+.mpd-utility span{display:inline-flex;align-items:center;gap:.56rem}
+.mpd-utility svg{width:15px;height:15px;flex:none}
+.mpd-head{background:#fff;border-bottom:1px solid #d8e1e5;font-family:"Open Sans",Arial,sans-serif}
+.mpd-head .mpd-in{min-height:85px;flex-wrap:wrap;padding:8px 0}
+.mpd-brand{display:inline-flex;align-items:center}
+.mpd-brand img{width:165px;height:auto;display:block}
+.mpd-head-t{margin-right:auto;padding-left:22px;border-left:1px solid #d8e1e5;display:flex;flex-direction:column;line-height:1.25;color:#4c606b;font-size:.82rem}
+.mpd-head-t strong{font:700 1.18rem/1.2 Roboto,Arial,sans-serif;color:#1c3643;letter-spacing:-.02em}
+.mpd-head-link{display:inline-flex;align-items:center;min-height:44px;padding:0 20px;border-radius:7px;border:1px solid #145e77;background:#145e77;color:#fff !important;font:700 .95rem/1.2 Roboto,Arial,sans-serif;text-decoration:none}
+.mpd-head-link:hover{background:#0f4c61}
+.mpd-head-link:focus-visible,.mpd-brand:focus-visible{outline:3px solid #a94c04;outline-offset:3px}
+.mpd-foot{background:#fff;border-top:1px solid #d8e1e5;border-bottom:5px solid #12556e;padding:24px 0 26px;font:400 .86rem/1.5 "Open Sans",Arial,sans-serif;color:#344650}
+.mpd-foot .mpd-in{flex-wrap:wrap;align-items:flex-start}
+.mpd-foot strong{display:block;font-size:1rem;color:#1c3643}
+@media(max-width:720px){.mpd-in{width:calc(100% - 36px)}.mpd-head .mpd-in{min-height:74px}.mpd-brand img{width:142px}.mpd-head-t{padding-left:14px}.mpd-utility{font-size:.7rem}.mpd-utility .mpd-in{min-height:30px}}
+@media(max-width:480px){.mpd-utility span:last-child{display:none}.mpd-head-t{flex-basis:100%;order:3;border-left:0;padding-left:0}}
+
+/* ---------- Ajustes de las pantallas anteriores al estilo nuevo ---------- */
+.pg h1,.pg h2,.pg h3,.app h1,.app h2,.app h3,.escenas h1{font-family:Roboto,Arial,sans-serif;letter-spacing:-.025em;color:#1c3643}
+.pg a:focus-visible,.app a:focus-visible,.pg button:focus-visible,.app button:focus-visible{outline:3px solid #a94c04;outline-offset:3px}
+.guia-cta{border-radius:7px !important;font-weight:700 !important}
+
+/* Pantalla «Ventana flotante»: el banner usa el botón blanco de la portada. */
+.demo-banner-btn{display:inline-flex;align-items:center;gap:.56rem;min-height:47px;padding:12px 21px;border-radius:7px;border:1px solid #fff;background:#fff;color:#17495c;font:700 .99rem/1.35 Roboto,Arial,sans-serif;cursor:pointer}
+.demo-banner-btn:hover{background:#e5f3f7}
+
+/* En modo revisión, la ventana de Justina MPD sube para no quedar bajo la barra de comentarios. */
+body.rv-active mpd-justina{--mpd-lift:62px}
+
+/* En modo revisión los diálogos de la página se abren sin bloquearla, para poder comentarlos. */
+body.rv-active dialog.panel-modal[open]{position:fixed;inset:0;margin:auto;height:fit-content;overflow:auto;z-index:900}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#13384a">
+<meta name="rv-version" content="{{version}}">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/opensans-400.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="assets/fonts/roboto-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/justina.css">
+<link rel="stylesheet" href="assets/css/tema.css">
+</head>
+<body data-page="{{page}}" class="{{bodyClass}}">
+{{protoNav}}
+{{main}}
+<script>
+  // Modo revisión (comentarios en vivo). Clave pública: el acceso real lo controla el código de sesión.
+  window.RV_REVIEW = {{reviewConfig}};
+</script>
+{{scripts}}
+<script src="assets/js/review.js" defer></script>
+</body>
+</html>

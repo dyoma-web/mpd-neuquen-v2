@@ -1,0 +1,18 @@
+{
+  "url": "https://ltdalwjcsfkjlmuxhlcy.supabase.co",
+  "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0ZGFsd2pjc2ZramxtdXhobGN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNzIwMzIsImV4cCI6MjEwNzY0ODAzMn0.yJmrCJyB361EsYVmhYfO0u8m7e_Vuk79TVHvesQKS94",
+  "site": "mpd-neuquen-v2",
+  "name": "Justina MPD · Defensa Pública de Neuquén (prototipo 2)",
+  "csv": "https://ltdalwjcsfkjlmuxhlcy.supabase.co/functions/v1/rv-csv",
+  "kinds": [
+    "gusta",
+    "no_gusta",
+    "falta",
+    "corregir",
+    "pregunta",
+    "idea",
+    "eliminar"
+  ],
+  "accent": "#56c1d5",
+  "font": "'Open Sans', Arial, sans-serif"
+}
