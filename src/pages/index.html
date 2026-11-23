@@ -55,12 +55,12 @@ page: ComoFunciona
 <section id="paginas" class="sec">
 <h2 class="h2">Qué revisar en cada pantalla</h2>
 <div class="guia-pages">
-<a class="card guia-page" href="asistente.html"><span class="g">Experiencia ciudadana · nuevo</span><h3 class="h3">Página de Justina MPD</h3><ul><li>¿Se entiende para qué sirve y para qué no?</li><li>¿Las direcciones, horarios y teléfonos del mapa están vigentes?</li><li>Abrí el chat y probá una consulta real (sin datos personales).</li></ul></a>
-<a class="card guia-page" href="estados.html"><span class="g">Experiencia ciudadana</span><h3 class="h3">Estados de la conversación</h3><ul><li>Nueve momentos clave de la conversación guiada, uno al lado del otro.</li><li>¿Los mensajes de urgencia dicen lo correcto?</li><li>¿La ficha de servicio tiene lo que la persona necesita?</li></ul></a>
+<a class="card guia-page" href="asistente.html"><span class="g">Experiencia ciudadana · nuevo</span><h3 class="h3">Página de Justina MPD</h3><ul><li>¿Se entiende para qué sirve y para qué no?</li><li>¿Las direcciones, horarios y teléfonos del mapa están vigentes?</li><li>¿El aviso de demostración se entiende?</li><li>Abrí el chat y probá una consulta real (sin datos personales).</li></ul></a>
+<a class="card guia-page" href="estados.html"><span class="g">Experiencia ciudadana</span><h3 class="h3">Estados de la conversación</h3><ul><li>Nueve momentos clave de la conversación, uno al lado del otro.</li><li>¿Los mensajes de urgencia dicen lo correcto?</li><li>¿La ficha de cada oficina tiene lo que la persona necesita?</li></ul></a>
 <a class="card guia-page" href="ventana.html"><span class="g">Experiencia ciudadana</span><h3 class="h3">Ventana flotante en el sitio del MPD</h3><ul><li>La ventana de Justina MPD sobre un esquema del sitio actual.</li><li>¿Ventana flotante o solo un banner con enlace?</li><li>¿Dónde debería aparecer en el sitio actual?</li></ul></a>
 <a class="card guia-page" href="como-funciona.html"><span class="g">Experiencia ciudadana</span><h3 class="h3">Cómo funciona este asistente</h3><ul><li>¿Los compromisos sobre datos e IA son los que la Defensa puede asumir?</li><li>¿Qué falta en los términos de uso?</li></ul></a>
-<a class="card guia-page" href="temas.html"><span class="g">Temas y flujos</span><h3 class="h3">Mapa de temas y árboles guiados</h3><ul><li>¿Las competencias de cada defensoría están bien asignadas?</li><li>¿Faltan localidades o temas?</li></ul></a>
-<a class="card guia-page" href="panel.html"><span class="g">Panel de la Defensa</span><h3 class="h3">Resumen, fichas y banco de pruebas</h3><ul><li>¿Qué métricas necesitan ver?</li><li>¿Quién edita y quién aprueba cada ficha?</li><li>Ejecutá el banco de pruebas: corre sobre la conversación guiada.</li></ul></a>
+<a class="card guia-page" href="temas.html"><span class="g">Temas y flujos</span><h3 class="h3">Mapa de recorridos</h3><ul><li>¿Los recorridos llevan a la oficina correcta?</li><li>¿Faltan localidades o temas?</li></ul></a>
+<a class="card guia-page" href="panel.html"><span class="g">Panel de la Defensa</span><h3 class="h3">Resumen, respuestas y banco de pruebas</h3><ul><li>¿Qué métricas necesitan ver?</li><li>¿Quién edita y quién aprueba cada respuesta?</li><li>Probá ocultar el chat en «Conexión y visibilidad» y mirá cómo queda la página.</li><li>Ejecutá el banco de pruebas: corre sobre el chat real.</li></ul></a>
 </div>
 </section>
 
@@ -68,7 +68,8 @@ page: ComoFunciona
 <h2 class="h2">Tener en cuenta</h2>
 <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;max-width:80ch">
 <li>Es un prototipo: no está conectado a los sistemas del Poder Judicial ni usa inteligencia artificial. El chat responde con textos predefinidos y reconoce las preguntas escritas por palabras clave.</li>
-<li>En esta versión conviven dos conversaciones: la ventana de la página de Justina MPD y la conversación guiada con fichas, que es la que muestran los estados y la que administra el panel. Falta decidir cómo se unifican; sus comentarios ayudan a definirlo.</li>
+<li>La conversación con Justina MPD estará disponible cuando el Ministerio cuente con las herramientas y las autorizaciones necesarias. Para ese momento queda construido un conector genérico para plataformas de consulta (RAG), hoy apagado, y un interruptor para ocultar el chat o dejarlo visible. Pueden probar el interruptor en el panel, en «Conexión y visibilidad».</li>
+<li>Hay una sola conversación en todo el prototipo: la ventana flotante, los estados, la pantalla completa y el panel usan las mismas respuestas.</li>
 <li>Las direcciones, horarios y teléfonos del mapa se tomaron del directorio publicado por el MPD y deben validarse antes de cualquier uso real.</li>
 <li>Los datos entre corchetes, como <span class="ph">[horario]</span>, están por completar con la Defensa. Las cifras del panel son ficticias.</li>
 <li>No escriban datos reales de personas ni de causas, ni en el asistente ni en los comentarios.</li>

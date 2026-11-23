@@ -24,7 +24,7 @@ motor: justina
 <span style="font-family:Roboto,Arial,sans-serif;font-weight:700;font-size:22px;letter-spacing:-.025em">¿Con quién puedo hablar?</span>
 <span style="color:#eaf2f5">Justina MPD te orienta para encontrar una defensoría, entender un aviso o conocer tus derechos.</span>
 </div>
-<button type="button" class="demo-banner-btn" data-chat=""><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-3 2v-8.5A9.5 9.5 0 0 1 11.5 4H14a7 7 0 0 1 7 7.5Z"></path><path d="M7 11h.01M11.5 11h.01M16 11h.01" stroke-width="2.7"></path></svg> Consultar a Justina MPD</button>
+<a class="demo-banner-btn" data-sin-chat href="asistente.html" style="text-decoration:none">Ir a la orientación ciudadana</a><button type="button" class="demo-banner-btn" data-chat=""><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H5l-3 2v-8.5A9.5 9.5 0 0 1 11.5 4H14a7 7 0 0 1 7 7.5Z"></path><path d="M7 11h.01M11.5 11h.01M16 11h.01" stroke-width="2.7"></path></svg> Consultar a Justina MPD</button>
 <span style="flex-basis:100%;font-size:13.5px;color:#d5e7ed">Alternativa mínima: este banner con un enlace a la <a href="asistente.html" style="color:#fff">página de Justina MPD</a>, si no se instala la ventana flotante.</span>
 </div>
 
@@ -36,9 +36,9 @@ motor: justina
 
 <div class="blk" style="padding:20px 24px;display:flex;flex-direction:column;gap:8px">
 <strong style="font-family:Roboto,Arial,sans-serif">Instalación en el sitio real</strong>
-<span style="font-size:15px;color:#4c606b">El equipo informático pega una sola línea en el sitio. La ventana se dibuja en un componente aislado: no cambia los estilos ni el contenido de la plataforma existente, no usa cookies y no se conecta a ningún servidor.</span>
+<span style="font-size:15px;color:#4c606b">El equipo informático pega una sola línea en el sitio. La ventana se dibuja en un componente aislado: no cambia los estilos ni el contenido de la plataforma existente y no usa cookies. Mientras esté en demostración, tampoco se conecta a ningún servidor.</span>
 <code style="display:block;padding:12px 14px;border-radius:8px;background:#1c3643;color:#eaf1f3;overflow-x:auto;font-size:13.5px">&lt;script src="<span data-ventana-src>https://[dominio]/assets/js/justina-ventana.js</span>" defer&gt;&lt;/script&gt;</code>
-<span style="font-size:15px;color:#4c606b">Cualquier botón del sitio puede abrir una consulta con el atributo <code>data-chat</code>, como el del banner de arriba. En esta pantalla la ventana es la real: el botón «Justina MPD» está abajo a la derecha.</span>
+<span style="font-size:15px;color:#4c606b">Cualquier botón del sitio puede abrir una consulta con el atributo <code>data-chat</code>, como el del banner de arriba. En esta pantalla la ventana es la real: el botón «Justina MPD» está abajo a la derecha. Si el chat se oculta desde la configuración, el botón flotante y los botones con <code>data-chat</code> desaparecen solos.</span>
 </div>
 </main>
 </div>

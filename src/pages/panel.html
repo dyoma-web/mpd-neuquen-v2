@@ -21,7 +21,7 @@ scripts: panel.js
 
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px">
 <div class="card" style="display:flex;flex-direction:column;gap:4px"><span class="small muted">Conversaciones</span><span class="kpi-v">1.284</span><span class="small muted">Sesiones iniciadas</span></div>
-<div class="card" style="display:flex;flex-direction:column;gap:4px"><span class="small muted">Resueltas por el asistente</span><span class="kpi-v">71 %</span><span class="small muted">Terminaron en una ficha</span></div>
+<div class="card" style="display:flex;flex-direction:column;gap:4px"><span class="small muted">Resueltas por el asistente</span><span class="kpi-v">71 %</span><span class="small muted">Terminaron en una respuesta o una oficina</span></div>
 <div class="card" style="display:flex;flex-direction:column;gap:4px"><span class="small muted">Derivadas a una persona</span><span class="kpi-v">18 %</span><span class="small muted">Pidieron atención humana</span></div>
 <div class="card" style="display:flex;flex-direction:column;gap:4px"><span class="small muted">«No lo sé»</span><span class="kpi-v">6 %</span><span class="small muted">Sin información validada</span></div>
 <div class="card" style="display:flex;flex-direction:column;gap:4px;border-color:#a9d8e2"><span class="small muted">Protocolo de urgencia</span><span class="kpi-v" style="color:#8F3A1C">23</span><span class="small muted">Activaciones</span></div>
@@ -33,7 +33,7 @@ scripts: panel.js
 <h2 class="h2">Temas más consultados</h2>
 <div class="barrow"><span>Familia y vivienda</span><span class="track"><span class="fill" style="width:38%"></span></span><span>38 %</span></div>
 <div class="barrow"><span>Defensa penal</span><span class="track"><span class="fill" style="width:24%"></span></span><span>24 %</span></div>
-<div class="barrow"><span>Violencias</span><span class="track"><span class="fill" style="width:14%"></span></span><span>14 %</span></div>
+<div class="barrow"><span>Avisos y notificaciones</span><span class="track"><span class="fill" style="width:14%"></span></span><span>14 %</span></div>
 <div class="barrow"><span>Niñez y adolescencia</span><span class="track"><span class="fill" style="width:9%"></span></span><span>9 %</span></div>
 <div class="barrow"><span>Salud mental</span><span class="track"><span class="fill" style="width:6%"></span></span><span>6 %</span></div>
 <div class="barrow"><span>Otros temas</span><span class="track"><span class="fill" style="width:9%"></span></span><span>9 %</span></div>
@@ -42,8 +42,8 @@ scripts: panel.js
 <h2 class="h2">Cómo consultan y cuándo</h2>
 <div style="display:flex;flex-direction:column;gap:6px">
 <span class="small" style="font-weight:700">Forma de consulta</span>
-<div style="display:flex;height:16px;border-radius:8px;overflow:hidden" role="img" aria-label="Menús guiados 62 %, texto libre 38 %"><span style="width:62%;background:#145e77"></span><span style="width:38%;background:#9bb6c3"></span></div>
-<span class="small muted">Menús guiados 62 % · Texto libre 38 %</span>
+<div style="display:flex;height:16px;border-radius:8px;overflow:hidden" role="img" aria-label="Botones 62 %, preguntas escritas 38 %"><span style="width:62%;background:#145e77"></span><span style="width:38%;background:#9bb6c3"></span></div>
+<span class="small muted">Botones 62 % · Preguntas escritas 38 %</span>
 </div>
 <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
 <span class="small" style="font-weight:700">Horario de las consultas</span>
@@ -69,11 +69,50 @@ scripts: panel.js
 <p class="small muted" style="margin:0" role="status" data-live></p>
 </section>
 
-<section id="instalacion" class="card" style="display:flex;flex-wrap:wrap;gap:16px 32px">
-<div style="flex:1 1 300px;display:flex;flex-direction:column;gap:6px"><h2 class="h2">Instalación en el sitio actual</h2><p class="small muted" style="margin:0">El equipo informático del MPD pega esta línea en su sitio para mostrar la ventana flotante. Sin intervenir la plataforma existente.</p></div>
+<section id="conexion" class="card" style="display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px">
+<div><h2 class="h2">Conexión y visibilidad</h2><p class="small muted" style="margin:4px 0 0">Desde acá se decide si el chat se muestra en el sitio y con qué responde.</p></div>
+<span class="tag" data-estado-chat style="background:#fff7e6;color:#5d4514">Demostración</span>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:16px">
+<div style="padding:18px;border-radius:10px;border:1px solid #d8e1e5;display:flex;flex-direction:column;gap:10px">
+<h3 class="h3">Mostrar el chat en el sitio</h3>
+<label style="display:flex;align-items:center;gap:12px;min-height:44px;font-weight:700"><input type="checkbox" data-interruptor style="width:22px;height:22px;accent-color:#145e77"> <span data-interruptor-t>El chat está visible</span></label>
+<p class="small muted" style="margin:0">Al ocultarlo desaparecen la ventana flotante y los botones que la abren. La guía de documentos, los derechos y el mapa de defensorías siguen disponibles.</p>
+<p class="small" style="margin:0"><a href="asistente.html">Ver la página con esta configuración</a></p>
+<p class="small muted" style="margin:0;padding-top:8px;border-top:1px solid #e4eef0">En el prototipo, este interruptor cambia solo tu navegador. En el sitio real es un valor del servidor (<code>CHAT_VISIBLE</code>) y vale para todas las personas.</p>
+</div>
+
+<div style="padding:18px;border-radius:10px;border:1px solid #d8e1e5;display:flex;flex-direction:column;gap:10px">
+<h3 class="h3">Con qué responde</h3>
+<p class="small" style="margin:0"><b>Hoy: textos predefinidos.</b> El chat muestra este aviso dentro de la ventana:</p>
+<p class="small" style="margin:0;padding:10px 12px;border-radius:8px;background:#fff7e6;color:#382e15;border:1px solid #d4bf90" data-aviso></p>
+<p class="small muted" style="margin:0">La conversación con el sistema del Ministerio se habilita cuando existan las herramientas y las autorizaciones necesarias. Esa decisión es del Ministerio y de su área de informática.</p>
+</div>
+</div>
+
+<div style="padding:18px;border-radius:10px;border:1px solid #d8e1e5;display:flex;flex-direction:column;gap:12px">
+<h3 class="h3">Conector para una plataforma de consulta (RAG)</h3>
+<p class="small" style="margin:0;max-width:90ch">El conector queda construido y apagado. Es un intermediario que se instala en el servidor del Ministerio: recibe la pregunta desde la página, agrega la clave y consulta la plataforma. La clave nunca llega al navegador. Para encenderlo hacen falta estos datos, que carga el área de informática en el servidor:</p>
+<div style="overflow-x:auto"><table style="width:100%">
+<thead><tr><th scope="col">Dato</th><th scope="col">Para qué sirve</th><th scope="col">Estado</th></tr></thead>
+<tbody>
+<tr><td><code>RAG_URL</code></td><td>Dirección de la plataforma de consulta</td><td><span class="tag" style="background:#f3f6f7;color:#4c606b">Sin configurar</span></td></tr>
+<tr><td><code>RAG_CLAVE</code></td><td>Clave de servidor de la plataforma</td><td><span class="tag" style="background:#f3f6f7;color:#4c606b">Sin configurar</span></td></tr>
+<tr><td><code>RAG_FORMATO</code></td><td>Cómo responde la plataforma: completa (<code>json</code>) o por fragmentos (<code>sse</code>, <code>ndjson</code>)</td><td><span class="tag" style="background:#f3f6f7;color:#4c606b">Sin configurar</span></td></tr>
+<tr><td><code>CHAT_OPERATIVO</code></td><td>Confirma que la conexión fue probada y puede usarse</td><td><span class="tag" style="background:#f3f6f7;color:#4c606b">No</span></td></tr>
+<tr><td><code>CHAT_VISIBLE</code></td><td>Muestra u oculta el chat en el sitio</td><td><span class="tag" style="background:#eaf1f3;color:#173947">Sí</span></td></tr>
+</tbody></table></div>
+<p class="small muted" style="margin:0">Aunque el chat esté conectado, los mensajes de urgencia y los que contienen datos personales se resuelven siempre en el navegador y no se envían. Si la plataforma no responde, el chat vuelve a los textos predefinidos. El detalle técnico está en la carpeta <code>conector/</code> del repositorio.</p>
+</div>
+
+<div id="instalacion" style="display:flex;flex-wrap:wrap;gap:16px 32px">
+<div style="flex:1 1 300px;display:flex;flex-direction:column;gap:6px"><h3 class="h3">Instalación en el sitio actual</h3><p class="small muted" style="margin:0">El equipo informático pega esta línea en el sitio para mostrar la ventana flotante, sin intervenir la plataforma existente.</p></div>
 <div style="flex:1 1 460px;min-width:0;display:flex;flex-direction:column;gap:8px">
 <div style="padding:14px 16px;border-radius:8px;background:#1c3643;color:#eaf1f3;overflow-x:auto"><code>&lt;script src="<span data-ventana-src>https://[dominio]/assets/js/justina-ventana.js</span>" defer&gt;&lt;/script&gt;</code></div>
-<span class="small muted">Alternativa mínima: un banner con enlace a <code>https://asistente.[dominio]</code>. <a href="ventana.html">Ver cómo se ve en el sitio</a>.</span>
+<span class="small muted">Alternativa mínima: un banner con enlace a la página de Justina MPD. <a href="ventana.html">Ver cómo se ve en el sitio</a>.</span>
+</div>
 </div>
 </section>
 </main>

@@ -1,7 +1,6 @@
 /* Comportamiento común del prototipo */
 (function () {
   'use strict';
-  const D = window.MPD_DATA;
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   /* Menú «Páginas del prototipo» */
@@ -14,14 +13,6 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) { toggle(false); btn.focus(); } });
     document.addEventListener('click', (e) => { if (!panel.hidden && !panel.contains(e.target) && !btn.contains(e.target)) toggle(false); });
   }
-
-  /* Bloques que se arman desde la base de conocimiento */
-  document.querySelectorAll('[data-render="sedes"]').forEach((el) => {
-    el.innerHTML = D.circunscripciones.map((c) => `<div class="card sede"><b>${esc(c.n)}</b><span class="small">${esc(c.locs)}</span><br><span class="small"><span class="ph">${esc(c.sedes)}</span> · Teléfono <span class="ph">[a validar]</span></span></div>`).join('');
-  });
-  document.querySelectorAll('[data-render="circ-table"]').forEach((el) => {
-    el.innerHTML = D.circunscripciones.map((c) => `<tr><td><b>${esc(c.n)}</b></td><td>${esc(c.locs)}</td><td>${esc(c.sedes)}</td></tr>`).join('');
-  });
 
   /* Botones de demostración: explican qué haría la versión final */
   let toastEl;

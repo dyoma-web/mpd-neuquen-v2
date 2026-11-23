@@ -1,7 +1,15 @@
 /* Panel de la Defensa · conversaciones para revisar */
 (function () {
   'use strict';
-  const D = window.MPD_DATA;
+  // Datos ficticios para el taller: en el sitio real salen del registro anónimo de uso.
+  const D = { revision: [
+    { id: 1, tipo: 'No supo responder', texto: '«¿La Defensa me puede ayudar con la herencia de mi papá?»', detalle: 'Civil y familia · No existe una respuesta sobre sucesiones', cuando: 'Hoy, 10:42', accion: 'Ver respuestas', href: 'fichas.html#civil' },
+    { id: 2, tipo: 'Situación crítica', texto: 'Se mostró el mensaje de violencia en curso', detalle: 'El contenido no se registra · Revisión obligatoria', cuando: 'Hoy, 02:15', accion: 'Ver mensaje', href: 'fichas.html#urgencias' },
+    { id: 3, tipo: 'Valoración negativa', texto: '«¿Dónde queda la defensoría de Aluminé?»', detalle: 'Localidades · Aluminé no figura en el directorio', cuando: 'Ayer, 18:03', accion: 'Ver localidades', href: 'temas.html#localidades' },
+    { id: 4, tipo: 'No supo responder', texto: '«¿Puedo pedir un defensor para un juicio laboral?»', detalle: 'Derivaciones · Falta el contacto del organismo laboral', cuando: 'Ayer, 09:27', accion: 'Editar respuesta', href: 'fichas.html#laboral' },
+    { id: 5, tipo: 'Informe de error', texto: '«Me dio un horario que ya no es»', detalle: 'Directorio · Defensa penal en Cutral Có', cuando: '12/11, 21:50', accion: 'Ver directorio', href: 'fichas.html#directorio' },
+    { id: 6, tipo: 'Situación crítica', texto: 'Se mostró el mensaje de salud mental', detalle: 'El contenido no se registra · Revisión obligatoria', cuando: '11/11, 23:12', accion: 'Ver mensaje', href: 'fichas.html#urgencias' }
+  ] };
   const ESTILO = {
     'No supo responder': 'background:#eaf1f3;color:#173947',
     'Situación crítica': 'background:#8F3A1C;color:#fff',
@@ -44,4 +52,25 @@
   const src = document.querySelector('[data-ventana-src]');
   if (src) src.textContent = new URL('assets/js/justina-ventana.js', location.href).href;
   render();
+
+  // Conexión y visibilidad: en el prototipo el interruptor vale solo para este navegador.
+  const J = window.JustinaMPD, sw = $('[data-interruptor]');
+  if (J && sw) {
+    const pintar = () => {
+      const v = J.isVisible();
+      sw.checked = v;
+      $('[data-interruptor-t]').textContent = v ? 'El chat está visible' : 'El chat está oculto';
+      const e = $('[data-estado-chat]');
+      e.textContent = !v ? 'Oculto' : J.config.modo === 'conectado' && J.config.conector.url ? 'Conectado' : 'Demostración';
+      e.style.cssText = !v ? 'background:#f3f6f7;color:#4c606b' : 'background:#fff7e6;color:#5d4514';
+    };
+    sw.addEventListener('change', () => {
+      try { localStorage.setItem('justina-mpd:visible', sw.checked ? '1' : '0'); } catch (e) { /* sin almacenamiento local */ }
+      J.setVisible(sw.checked);
+      pintar();
+      $('[data-live]').textContent = sw.checked ? 'El chat quedó visible en este navegador.' : 'El chat quedó oculto en este navegador.';
+    });
+    $('[data-aviso]').textContent = J.config.aviso;
+    pintar();
+  }
 })();

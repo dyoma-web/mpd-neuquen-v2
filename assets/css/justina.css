@@ -140,3 +140,24 @@ html.high-contrast .hero{background:#101d25}html.high-contrast .hero :is(h1,h2,p
 .map-town circle.map-target,.map-town:focus-visible circle.map-target,.map-town:hover circle.map-target,.map-town.selected circle.map-target{fill:transparent;stroke:none}
 
 .protect .privacy-link{margin-top:.65rem;color:var(--deep);font-weight:600;text-align:left}.privacy-notice .dialog-head{align-items:flex-start}.privacy-notice .dialog-head button{flex-shrink:0}.privacy-notice .legal-links{display:grid;gap:.45rem;font-size:.9rem}.privacy-notice .legal-links a{text-underline-offset:3px}
+
+/* Aviso de demostración y página con el chat oculto (clase justina-oculta en <html>). */
+.demo-label{align-items:flex-start;max-width:540px;line-height:1.5;gap:.6rem}.demo-label .ic{margin-top:3px}.demo-label strong{font-weight:700}
+[data-sin-chat]{display:none!important}
+.justina-oculta [data-sin-chat]{display:inline-flex!important}
+.justina-oculta [data-chat],.justina-oculta [data-con-chat]{display:none!important}
+.justina-oculta .hero .primary[data-sin-chat]{text-decoration:none}
+[data-modo="conectado"]{display:none}.justina-conectada [data-modo="conectado"]{display:block}.justina-conectada [data-modo="demostracion"]{display:none}
+
+/* Mapa de defensorías con cartografía (Leaflet). Si no carga, queda el esquema de la provincia. */
+.map-real{flex:1;min-height:440px;background:#dfe9ec;z-index:0}
+.map-panel.con-mapa .map-canvas,.map-panel.con-mapa #map-out,.map-panel.con-mapa #map-in{display:none}
+.map-zoom .map-reset{width:auto;height:35px;padding:0 12px;font-size:.84rem;font-weight:600}
+.map-real .leaflet-container,.map-real.leaflet-container{font:inherit}
+.leaflet-tooltip.mpd-tip{background:#fff;border:1px solid #9fb7c0;border-radius:5px;box-shadow:0 1px 4px #17394726;color:#17394a;font:600 .8rem/1.2 "Open Sans",Arial,sans-serif;padding:3px 7px}
+.leaflet-tooltip.mpd-tip::before{display:none}
+.leaflet-tooltip.mpd-tip.sel{background:#173947;border-color:#173947;color:#fff}
+.map-real .leaflet-popup-content{font:400 .88rem/1.45 "Open Sans",Arial,sans-serif;color:#344650;margin:12px 14px}
+.map-real .leaflet-popup-content strong{display:block;color:#1c3643;font-size:.95rem;margin-bottom:2px}
+.map-real .leaflet-interactive:focus-visible{outline:3px solid var(--focus)}
+@media(max-width:720px){.map-real{min-height:360px}}

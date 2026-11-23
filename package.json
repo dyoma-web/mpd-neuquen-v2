@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node test/chat.test.mjs",
+    "test": "node test/justina.test.mjs",
     "preview": "node build.mjs && npx --yes serve dist"
   },
   "engines": { "node": ">=18" },

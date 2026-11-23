@@ -1,6 +1,6 @@
 ---
-title: Fichas y derivaciones
-description: Panel interno de la Defensa: edición de fichas de servicio, directorio de derivación y mensajes de urgencia.
+title: Respuestas y directorio
+description: Panel interno de la Defensa: respuestas de Justina MPD, directorio de oficinas y mensajes de urgencia.
 page: Contenidos
 panel: fichas
 who: [Persona responsable]<br>Rol: editora de contenidos
@@ -11,49 +11,33 @@ scripts: fichas.js
 
 <main id="contenido" class="main">
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px">
-<div style="display:flex;flex-direction:column;gap:4px"><h1 class="h1">Fichas y derivaciones</h1><span class="small muted">Cada ficha es la única fuente de las respuestas del asistente sobre ese tema.</span></div>
-<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span class="tag" style="background:#f3f6f7;color:#5d4514">Datos ficticios para el taller</span><button type="button" class="btn btn-p" data-nueva>Nueva ficha</button></div>
+<div style="display:flex;flex-direction:column;gap:4px"><h1 class="h1">Respuestas y directorio</h1><span class="small muted">Estas son las respuestas reales de Justina MPD: lo que se edita acá es lo que muestra el chat.</span></div>
+<span class="tag" style="background:#fff7e6;color:#5d4514">Los cambios duran hasta recargar la página</span>
 </div>
 
 <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start">
-<section class="card" style="flex:1 1 380px;min-width:0;padding:0;overflow:hidden" aria-labelledby="t-fichas">
+<section class="card" style="flex:1 1 340px;min-width:0;padding:0;overflow:hidden" aria-labelledby="t-fichas">
 <div style="padding:16px 16px 12px;display:flex;flex-direction:column;gap:10px">
-<h2 class="h2" id="t-fichas">Fichas de servicio <span class="small muted" data-count></span></h2>
-<label class="lbl" for="buscar-ficha" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar ficha</label>
-<input id="buscar-ficha" class="inp" type="search" placeholder="Buscar por título, tema o palabra" autocomplete="off">
+<h2 class="h2" id="t-fichas">Respuestas <span class="small muted" data-count></span></h2>
+<label class="lbl" for="buscar-ficha" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar una respuesta</label>
+<input id="buscar-ficha" class="inp" type="search" placeholder="Buscar por pregunta o palabra" autocomplete="off">
+<label class="small" style="display:flex;align-items:center;gap:8px"><input type="checkbox" data-solo-pendientes> Ver solo las pendientes de aprobación</label>
 </div>
-<div data-lista></div>
-<p class="small muted" style="margin:0;padding:12px 16px" data-sin-res hidden>No hay fichas que coincidan con la búsqueda.</p>
+<div data-lista style="max-height:620px;overflow:auto"></div>
+<p class="small muted" style="margin:0;padding:12px 16px" data-sin-res hidden>No hay respuestas que coincidan con la búsqueda.</p>
+<p class="small muted" style="margin:0;padding:12px 16px;border-top:1px solid #e4eef0">Las fichas de cada oficina se arman solas con el directorio de más abajo y no figuran en esta lista.</p>
 </section>
 
-<section class="card" style="flex:1.6 1 560px;min-width:0;display:flex;flex-direction:column;gap:16px" aria-labelledby="t-editar">
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px"><h2 class="h2" id="t-editar">Editar ficha</h2><span class="tag" data-estado></span></div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px">
-<div><label class="lbl" for="f-titulo">Título</label><input id="f-titulo" class="inp" data-campo="titulo"></div>
-<div><label class="lbl" for="f-tema">Tema del menú</label><select id="f-tema" class="inp" data-campo="tema"><option>Familia y vivienda</option><option>Defensa penal</option><option>Niñas, niños y adolescentes</option><option>Violencias</option><option>Salud mental y discapacidad</option></select></div>
-</div>
-<div><label class="lbl" for="f-que">Qué hace la Defensa</label><textarea id="f-que" class="inp" rows="3" data-campo="que"></textarea></div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px">
-<div><label class="lbl" for="f-quien">Quién puede acceder</label><textarea id="f-quien" class="inp" rows="3" data-campo="quien"></textarea></div>
-<div><label class="lbl" for="f-llevar">Qué llevar (uno por línea)</label><textarea id="f-llevar" class="inp" rows="3" data-campo="llevar"></textarea></div>
-</div>
-<div><label class="lbl" for="f-nota">Aviso destacado (opcional)</label><input id="f-nota" class="inp" data-campo="nota"></div>
-<div>
-<span class="lbl" id="l-palabras">Palabras con que la gente lo pregunta</span>
-<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center" role="group" aria-labelledby="l-palabras"><span style="display:contents" data-palabras></span>
-<label for="f-palabra" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Nueva palabra</label>
-<input id="f-palabra" class="inp" style="width:auto;flex:0 1 180px;min-height:32px;padding:4px 10px;font-size:13.5px" placeholder="Nueva palabra">
-<button type="button" class="btn" style="min-height:32px;padding:0 10px;font-size:13px" data-add-palabra>Agregar</button></div>
-<p class="small muted" style="margin:6px 0 0">Ayudan a que el asistente reconozca la consulta cuando se escribe con palabras propias.</p>
-</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:14px">
-<div><label class="lbl" for="f-area">Área responsable</label><input id="f-area" class="inp" data-campo="servicio"></div>
-<div><label class="lbl" for="f-rev">Última revisión</label><input id="f-rev" class="inp" data-campo="rev" placeholder="dd/mm/aaaa"></div>
-<div><label class="lbl" for="f-prox">Próxima revisión</label><input id="f-prox" class="inp" data-campo="prox" placeholder="dd/mm/aaaa"></div>
-</div>
+<section class="card" style="flex:1.5 1 480px;min-width:0;display:flex;flex-direction:column;gap:16px" aria-labelledby="t-editar">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px"><h2 class="h2" id="t-editar">Editar respuesta</h2><span class="tag" data-estado></span></div>
+<div><label class="lbl" for="f-pregunta">Cómo se muestra la consulta de la persona</label><input id="f-pregunta" class="inp" data-campo="question"></div>
+<div><label class="lbl" for="f-texto">Respuesta de Justina MPD</label><textarea id="f-texto" class="inp" rows="8" data-campo="text"></textarea><p class="small muted" style="margin:6px 0 0">Una línea en blanco separa párrafos. Lo que esté entre corchetes queda marcado como dato por validar.</p></div>
+<div><span class="lbl">Fuentes y enlaces que acompañan la respuesta</span><ul class="small" style="margin:0;padding-left:20px" data-enlaces></ul></div>
+<div><span class="lbl">Botones para seguir</span><div style="display:flex;flex-wrap:wrap;gap:6px" data-opciones></div></div>
+<div><span class="lbl">Desde dónde se llega a esta respuesta</span><div style="display:flex;flex-wrap:wrap;gap:6px" data-origenes></div></div>
 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-top:6px;border-top:1px solid #e4eef0">
-<button type="button" class="btn" data-accion="Borrador">Guardar borrador</button>
-<button type="button" class="btn" data-accion="En revisión">Enviar a revisión</button>
+<button type="button" class="btn btn-p" data-probar>Probar en la vista previa</button>
+<button type="button" class="btn" data-demo="En la versión final, el cambio pasa al área responsable para su aprobación. En el prototipo no se envía nada.">Enviar a revisión</button>
 <button type="button" class="btn btn-off" aria-disabled="true" aria-describedby="pub-nota">Publicar</button>
 <a href="pruebas.html" class="small" id="pub-nota">Se habilita cuando pasa el banco de pruebas</a>
 <span class="ok-msg" role="status" data-ok></span>
@@ -61,25 +45,25 @@ scripts: fichas.js
 </section>
 
 <section style="flex:1 1 340px;min-width:0;max-width:420px;display:flex;flex-direction:column;gap:10px" aria-labelledby="t-prev">
-<h2 class="h2" id="t-prev">Vista previa en el asistente</h2>
-<div><label class="lbl" for="prev-loc">Ver como si la persona vive en</label><select id="prev-loc" class="inp" data-prev-loc></select></div>
-<div style="padding:16px;border-radius:14px;background:#f3f6f7;border:1px solid #d8e1e5;display:flex;flex-direction:column;gap:8px" data-preview></div>
+<h2 class="h2" id="t-prev">Vista previa en el chat</h2>
+<div style="height:620px;border-radius:16px;overflow:hidden;border:1px solid #c8d7de;background:#fff" data-preview></div>
 </section>
 </div>
 
+<section id="urgencias" class="card" style="display:flex;flex-direction:column;gap:14px">
+<div><h2 class="h2">Mensajes de urgencia</h2><p class="small muted" style="margin:4px 0 0">Mensajes fijos que interrumpen cualquier recorrido. Se responden siempre en el navegador, aunque el chat esté conectado a un servicio externo, y requieren aprobación de la Defensa.</p></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:14px" data-urgencias></div>
+</section>
+
 <section id="directorio" class="card" style="display:flex;flex-direction:column;gap:14px">
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px"><div><h2 class="h2">Directorio de derivación</h2><p class="small muted" style="margin:4px 0 0">Organismos a los que el asistente deriva cuando la consulta no es de la Defensa o hay una urgencia.</p></div><button type="button" class="btn" data-demo="En la versión final se abre un formulario para cargar el organismo, su contacto y para qué consultas se usa.">Agregar organismo</button></div>
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px"><div><h2 class="h2">Directorio de oficinas <span class="small muted" data-dir-count></span></h2><p class="small muted" style="margin:4px 0 0">Es la misma lista que usan el mapa de defensorías y el chat. Los datos salen del directorio publicado por el MPD y deben validarse.</p></div><button type="button" class="btn" data-demo="En la versión final se abre un formulario para cargar la oficina, su dirección, horario y teléfono.">Agregar oficina</button></div>
 <div style="overflow-x:auto">
 <table>
-<thead><tr><th scope="col">Organismo</th><th scope="col">Para qué tipo de consulta</th><th scope="col">Contacto</th><th scope="col">Prioridad</th></tr></thead>
+<thead><tr><th scope="col">Localidad</th><th scope="col">Oficina</th><th scope="col">Tema</th><th scope="col">Dirección y horario</th><th scope="col">Teléfono</th><th scope="col">En el mapa</th></tr></thead>
 <tbody data-directorio></tbody>
 </table>
 </div>
 </section>
-
-<section id="urgencias" class="card" style="display:flex;flex-direction:column;gap:14px">
-<div><h2 class="h2">Mensajes de urgencia</h2><p class="small muted" style="margin:4px 0 0">Textos fijos: el asistente los muestra tal como están aprobados y la inteligencia artificial no los modifica.</p></div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:12px" data-urgencias></div>
-</section>
+<p class="small" role="status" aria-live="polite" data-live style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></p>
 </main>
 </div>

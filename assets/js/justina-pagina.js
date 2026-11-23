@@ -137,6 +137,7 @@
   byId('map-out').addEventListener('click',()=>setZoom(Math.max(zoomIndex-1,0)));
   setZoom(0);
   function showStreet(city,office,target,trigger) {
+    if (mapa) { enfocarOficina(city, office); return; }
     mapPanel.querySelector('.street-view')?.remove();
     const viewer=make('div',null,'street-view');
     const bar=make('div',null,'street-head');
@@ -191,6 +192,7 @@
       list.append(grid);
     }
     list.parentElement.scrollTop = 0;
+    pintarMapa();
   }
   byId('place-status').tabIndex=-1;
   citySelect.addEventListener('change',showResults);
@@ -201,6 +203,97 @@
     point.addEventListener('click',selectPoint);
     point.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();selectPoint()}});
   }
+  /* Mapa con cartografía (Leaflet). La librería y las imágenes del mapa se piden recién cuando la sección
+     está por verse. Si no se pueden cargar, queda el esquema de la provincia y todo sigue funcionando. */
+  const LEAFLET = 'https://unpkg.com/leaflet@1.9.4/dist/';
+  let mapa = null, capaCiudades = null, capaOficinas = null, pedido = null;
+  const marcas = new Map();
+  function cargarLeaflet() {
+    if (pedido) return pedido;
+    pedido = new Promise((ok, no) => {
+      if (window.L) return ok();
+      const css = make('link'); css.rel = 'stylesheet'; css.href = LEAFLET + 'leaflet.css';
+      css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='; css.crossOrigin = '';
+      const js = make('script'); js.src = LEAFLET + 'leaflet.js';
+      js.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='; js.crossOrigin = '';
+      js.onload = () => ok(); js.onerror = no; css.onerror = no;
+      document.head.append(css, js);
+    }).then(iniciarMapa);
+    pedido.catch(() => { /* sin mapa: queda el esquema */ });
+    return pedido;
+  }
+  function iniciarMapa() {
+    const L = window.L, caja = byId('mapa-real');
+    caja.hidden = false;
+    mapPanel.classList.add('con-mapa');
+    mapa = L.map(caja, {scrollWheelZoom:false, minZoom:6, maxZoom:17, zoomSnap:.5, dragging:!L.Browser.mobile, tap:false});
+    mapa.attributionControl.setPrefix(false);
+    // Cartografía oficial del Instituto Geográfico Nacional; si no responde, OpenStreetMap.
+    const ign = L.tileLayer('https://wms.ign.gob.ar/geoserver/gwc/service/tms/1.0.0/capabaseargenmap@EPSG%3A3857@png/{z}/{x}/{-y}.png', {maxZoom:17, attribution:'Cartografía: Instituto Geográfico Nacional · OpenStreetMap'});
+    let reemplazada = false;
+    ign.on('tileerror', () => {
+      if (reemplazada) return;
+      reemplazada = true;
+      mapa.removeLayer(ign);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:17, attribution:'© Colaboradores de OpenStreetMap'}).addTo(mapa);
+    });
+    ign.addTo(mapa);
+    capaCiudades = L.layerGroup().addTo(mapa);
+    capaOficinas = L.layerGroup().addTo(mapa);
+    for (const city of cities) {
+      const punto = L.circleMarker([city.lat, city.lon], {radius:8, color:'#fff', weight:2.5, fillColor:'#22667c', fillOpacity:1, bubblingMouseEvents:false});
+      // Las etiquetas se reparten alrededor de cada punto para que no se pisen en la vista de toda la provincia.
+      const lado = {andacollo:'left', chos:'bottom', zapala:'left', cutral:'top', junin:'top', sanmartin:'left', villa:'left'}[city.id] || 'right';
+      punto.bindTooltip(city.name, {permanent:true, direction:lado, offset:{left:[-10,0], right:[10,0], top:[0,-9], bottom:[0,9]}[lado], className:'mpd-tip'});
+      punto.on('click', () => { citySelect.value = city.id; showResults(); });
+      punto.cityId = city.id;
+      capaCiudades.addLayer(punto);
+    }
+    byId('map-reset').addEventListener('click', () => { citySelect.value = ''; showResults(); });
+    const nota = document.querySelector('[data-map-note]');
+    if (nota) nota.textContent = 'Tocá un punto para ver las oficinas de esa localidad. Podés acercar el mapa con los botones + y −.';
+    pintarMapa();
+  }
+  function pintarMapa() {
+    if (!mapa) return;
+    const L = window.L, town = citySelect.value, topic = topicSelect.value;
+    capaOficinas.clearLayers();
+    marcas.clear();
+    capaCiudades.eachLayer(punto => {
+      const city = cities.find(c => c.id === punto.cityId);
+      const disponible = city.offices.some(o => !topic || o.topic === topic);
+      punto.setStyle({fillColor: city.id === town ? '#b34b21' : '#22667c', fillOpacity: disponible ? 1 : .35, opacity: disponible ? 1 : .45});
+      const etiqueta = punto.getTooltip() && punto.getTooltip().getElement();
+      if (etiqueta) { etiqueta.classList.toggle('sel', city.id === town); etiqueta.style.opacity = disponible ? '' : '.55'; }
+    });
+    byId('map-reset').hidden = !town;
+    if (!town) { mapa.fitBounds(L.latLngBounds(cities.map(c => [c.lat, c.lon])).pad(.14)); return; }
+    const city = cities.find(c => c.id === town), puntos = [];
+    for (const office of city.offices.filter(o => !topic || o.topic === topic)) {
+      if (!Number.isFinite(office.lat) || !Number.isFinite(office.lon)) continue;
+      const globo = make('div');
+      globo.append(make('strong', office.name), make('span', office.address || city.name));
+      const marca = L.circleMarker([office.lat, office.lon], {radius:7, color:'#fff', weight:2, fillColor:'#b34b21', fillOpacity:1}).bindPopup(globo);
+      capaOficinas.addLayer(marca);
+      marcas.set(office.id, marca);
+      puntos.push([office.lat, office.lon]);
+    }
+    if (puntos.length) mapa.fitBounds(L.latLngBounds(puntos).pad(.8), {maxZoom:15});
+    else mapa.setView([city.lat, city.lon], 12);
+  }
+  function enfocarOficina(city, office) {
+    const marca = marcas.get(office.id);
+    if (marca) { mapa.setView(marca.getLatLng(), 16); marca.openPopup(); }
+    else mapa.setView([city.lat, city.lon], 13);
+    mapPanel.scrollIntoView({block:'nearest'});
+  }
+  if ('IntersectionObserver' in window) {
+    const vigia = new IntersectionObserver(entradas => {
+      if (entradas.some(e => e.isIntersecting)) { vigia.disconnect(); cargarLeaflet(); }
+    }, {rootMargin:'500px'});
+    vigia.observe(byId('sedes'));
+  } else cargarLeaflet();
+
   function focusMap(city='',topic='') {
     citySelect.value=city;
     topicSelect.value=topic;

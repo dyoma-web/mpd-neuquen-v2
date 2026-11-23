@@ -37,16 +37,21 @@ kicker: Cómo funciona este asistente
 
 <section id="como" class="sec">
 <h2 class="h2">Cómo responde</h2>
+<div class="card" style="background:#fff7e6;border-color:#d4bf90;color:#382e15;display:flex;flex-direction:column;gap:8px">
+<h3 class="h3" style="color:#382e15">Estado actual: versión de demostración</h3>
+<p class="p small" style="margin:0">La conversación con Justina MPD estará disponible cuando el Ministerio cuente con las herramientas y las autorizaciones necesarias. Mientras tanto, el chat responde con textos predefinidos.</p>
+<p class="p small" style="margin:0">Para ese momento quedan construidas dos piezas: un conector genérico para plataformas de consulta sobre documentos (RAG), que hoy está apagado, y un interruptor que permite ocultar el chat o dejarlo visible cuando el Ministerio lo decida. Con el chat oculto, la guía de documentos, los derechos y el mapa de defensorías siguen funcionando.</p>
+</div>
 <p class="p">El asistente combina dos formas de responder. Las dos usan solamente información escrita y aprobada por la Defensa Pública.</p>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:16px">
-<div class="card" style="display:flex;flex-direction:column;gap:8px"><span class="small" style="font-weight:700;color:#145e77">Capa 1</span><h3 class="h3">Menús guiados</h3><p class="p small">Elegís opciones y el asistente te muestra una respuesta fija, escrita y revisada una a una por la Defensa. Siempre dice lo mismo ante la misma elección.</p></div>
-<div class="card" style="display:flex;flex-direction:column;gap:8px"><span class="small" style="font-weight:700;color:#145e77">Capa 2</span><h3 class="h3">Preguntas con tus palabras</h3><p class="p small">Cuando escribís libremente, el sistema busca los fragmentos que correspondan en la base de conocimiento de la Defensa, y un modelo de lenguaje redacta la respuesta usando solo esos fragmentos.</p></div>
+<div class="card" style="display:flex;flex-direction:column;gap:8px"><span class="small" style="font-weight:700;color:#145e77">Capa 1</span><h3 class="h3">Botones</h3><p class="p small">Elegís opciones y el asistente te muestra una respuesta fija, escrita y revisada una a una por la Defensa. Siempre dice lo mismo ante la misma elección. Esta capa funciona hoy y seguirá igual cuando el chat se conecte.</p></div>
+<div class="card" style="display:flex;flex-direction:column;gap:8px"><span class="small" style="font-weight:700;color:#145e77">Capa 2</span><h3 class="h3">Preguntas con tus palabras</h3><p class="p small"><b>Hoy:</b> el chat reconoce tu consulta por palabras clave y te muestra la respuesta predefinida que corresponde. <b>Cuando el Ministerio habilite la conexión:</b> la pregunta se enviará a su plataforma de consulta, que buscará en los documentos aprobados y redactará la respuesta usando solo esos fragmentos. Las señales de urgencia y los datos personales se seguirán resolviendo en tu navegador, sin enviarse.</p></div>
 </div>
 <div class="card" style="background:#eaf1f3;border-color:#c6d9dc">
 <h3 class="h3" style="margin-bottom:10px">Reglas que sigue siempre</h3>
 <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px">
 <li>Responde solo con información de la base de conocimiento de la Defensa.</li>
-<li>Indica de qué ficha sale cada respuesta y cuándo se revisó.</li>
+<li>Acompaña cada respuesta con su fuente oficial: el directorio del MPD o el artículo de la ley.</li>
 <li>Si no tiene información suficiente, lo dice y te ofrece hablar con una persona.</li>
 <li>Nunca te pide nombre, documento, dirección ni datos de tu causa.</li>
 </ul>

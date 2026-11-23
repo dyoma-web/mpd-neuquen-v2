@@ -4,15 +4,15 @@ description: Panel interno de la Defensa: preguntas de prueba que se ejecutan an
 page: Pruebas
 panel: pruebas
 who: [Persona responsable]<br>Rol: publicación
-scripts: pruebas.js
+scripts: justina-pruebas.js, pruebas.js
 ---
 <div class="app">
 {{panelSide}}
 
 <main id="contenido" class="main">
 <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px">
-<div style="display:flex;flex-direction:column;gap:4px"><h1 class="h1">Banco de pruebas y publicación</h1><span class="small muted">Cada cambio en fichas, árboles o modelo se prueba con estas preguntas antes de publicarse.</span></div>
-<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span class="tag" style="background:#eaf1f3;color:#173947">Se ejecuta sobre el asistente real del prototipo</span><button type="button" class="btn btn-p" data-ejecutar>Ejecutar todas las pruebas</button></div>
+<div style="display:flex;flex-direction:column;gap:4px"><h1 class="h1">Banco de pruebas y publicación</h1><span class="small muted">Cada cambio en las respuestas, el directorio o la conexión se prueba con estas preguntas antes de publicarse.</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span class="tag" style="background:#eaf1f3;color:#173947">Se ejecuta sobre el chat real del prototipo</span><button type="button" class="btn btn-p" data-ejecutar>Ejecutar todas las pruebas</button></div>
 </div>
 
 <div style="display:flex;flex-wrap:wrap;gap:14px">
@@ -21,7 +21,7 @@ scripts: pruebas.js
 <div style="flex:2 1 380px;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid #d8e1e5" data-puerta role="status">
 <span style="font-family:Roboto,sans-serif;font-weight:600;font-size:18px" data-puerta-t>Falta probar los cambios</span>
 <span class="small" data-puerta-p>Ejecutá el banco de pruebas antes de publicar.</span>
-<div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="btn" aria-disabled="true" data-publicar>Publicar cambios</button><a class="btn" href="fichas.html" style="background:#fff">Corregir fichas</a></div>
+<div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="btn" aria-disabled="true" data-publicar>Publicar cambios</button><a class="btn" href="fichas.html" style="background:#fff">Corregir respuestas</a></div>
 </div>
 </div>
 
@@ -44,16 +44,16 @@ scripts: pruebas.js
 <section class="card" style="flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:10px">
 <h2 class="h2">Cambios listos para publicar</h2>
 <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px">
-<li>Ficha «Cuota alimentaria»: nuevo texto de quién puede acceder. Enviado por <span style="background:#f3f6f7;color:#5d4514;padding:0 4px;border-radius:3px">[área]</span>.</li>
-<li>Directorio de derivación: se agrega la Dirección de Defensa del Consumidor.</li>
-<li>Árbol de violencias: nueva opción «De un familiar».</li>
-<li>Texto libre: se reconocen consultas de menores de 18 en riesgo y de violencia sin poder hablar.</li>
+<li>Respuesta «Cuota alimentaria»: texto nuevo. Enviado por <span style="background:#f3f6f7;color:#5d4514;padding:0 4px;border-radius:3px">[área]</span>.</li>
+<li>Directorio: horario nuevo de una oficina.</li>
+<li>Mensajes de urgencia: cuatro textos esperan la aprobación de la Defensa.</li>
+<li>Preguntas escritas: se reconocen consultas de menores de 18 en riesgo y de violencia sin poder hablar.</li>
 </ul>
 </section>
 <section id="historial" class="card" style="flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:10px">
 <h2 class="h2">Historial de versiones</h2>
 <ul style="list-style:none;margin:0;padding:0">
-<li style="display:flex;gap:14px;padding:10px 0;border-top:1px solid #e4eef0"><span style="flex:none;width:56px;font-family:Roboto,sans-serif;font-weight:700;color:#145e77">0.3</span><span class="small">Publicada el 10/10/2026 por [persona]. Tres fichas nuevas de familia. 14 de 14 pruebas aprobadas.</span></li>
+<li style="display:flex;gap:14px;padding:10px 0;border-top:1px solid #e4eef0"><span style="flex:none;width:56px;font-family:Roboto,sans-serif;font-weight:700;color:#145e77">0.3</span><span class="small">Publicada el 10/10/2026 por [persona]. Página de Justina MPD y conversación unificada.</span></li>
 <li style="display:flex;gap:14px;padding:10px 0;border-top:1px solid #e4eef0"><span style="flex:none;width:56px;font-family:Roboto,sans-serif;font-weight:700;color:#145e77">0.2</span><span class="small">Publicada el 30/09/2026. Mensajes de urgencia en revisión de PNUD.</span></li>
 <li style="display:flex;gap:14px;padding:10px 0;border-top:1px solid #e4eef0"><span style="flex:none;width:56px;font-family:Roboto,sans-serif;font-weight:700;color:#145e77">0.1</span><span class="small">Prototipo para validación con la Defensa.</span></li>
 </ul>

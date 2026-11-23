@@ -14,12 +14,12 @@ const PAGES = [
   ['index', 'Guía de la sesión de revisión', 'Para empezar'],
   ['asistente', 'Página de Justina MPD', 'Experiencia ciudadana'],
   ['ventana', 'Ventana flotante en el sitio del MPD', 'Experiencia ciudadana'],
-  ['chat', 'Conversación guiada a pantalla completa (celular)', 'Experiencia ciudadana'],
+  ['chat', 'Conversación a pantalla completa (celular)', 'Experiencia ciudadana'],
   ['estados', 'Estados de la conversación', 'Experiencia ciudadana'],
   ['como-funciona', 'Cómo funciona este asistente', 'Experiencia ciudadana'],
-  ['temas', 'Mapa de temas y árboles guiados', 'Temas y flujos'],
+  ['temas', 'Mapa de recorridos', 'Temas y flujos'],
   ['panel', 'Resumen y revisión', 'Panel de la Defensa'],
-  ['fichas', 'Fichas y derivaciones', 'Panel de la Defensa'],
+  ['fichas', 'Respuestas y directorio', 'Panel de la Defensa'],
   ['pruebas', 'Banco de pruebas y publicación', 'Panel de la Defensa']
 ];
 
@@ -27,11 +27,11 @@ const PAGES = [
 const PANEL_NAV = [
   { id: 'resumen', t: 'Resumen', href: 'panel.html' },
   { id: 'revision', t: 'Conversaciones para revisar', href: 'panel.html#revision', badge: true },
-  { id: 'fichas', t: 'Fichas y derivaciones', href: 'fichas.html' },
-  { id: 'temas', t: 'Árboles guiados', href: 'temas.html' },
+  { id: 'fichas', t: 'Respuestas y directorio', href: 'fichas.html' },
+  { id: 'temas', t: 'Mapa de recorridos', href: 'temas.html' },
   { id: 'pruebas', t: 'Banco de pruebas', href: 'pruebas.html' },
   { id: 'historial', t: 'Publicaciones', href: 'pruebas.html#historial' },
-  { id: 'instalacion', t: 'Instalación', href: 'panel.html#instalacion' }
+  { id: 'instalacion', t: 'Conexión y visibilidad', href: 'panel.html#conexion' }
 ];
 
 const REVIEW = JSON.parse(readFileSync(join(ROOT, 'review.config.json'), 'utf8'));
@@ -40,9 +40,14 @@ const read = (p) => readFileSync(p, 'utf8');
 // Dos plantillas: la de la página de Justina MPD (diseño nuevo, con su propia hoja de estilos)
 // y la de las pantallas de documentación y del panel.
 const LAYOUTS = { base: read(join(SRC, 'layout.html')), justina: read(join(SRC, 'layout-justina.html')) };
-// Dos motores de conversación que no deben cargarse juntos (los dos usan el atributo data-chat):
-// «justina» es la ventana flotante nueva; «guiada» es el chat con fichas que alimenta el panel.
-const MOTORES = { justina: ['justina-ventana.js', 'app.js'], guiada: ['data.js', 'chat.js', 'app.js'] };
+// Un solo motor de conversación (justina-ventana.js), con tres formas de cargarlo:
+// «justina» muestra la ventana flotante; «justina-incrustada» solo monta conversaciones dentro de la página
+// (estados, pantalla completa y panel), sin botón flotante.
+const BASE_MOTOR = ['justina-config.js'];
+const MOTORES = {
+  justina: { scripts: [...BASE_MOTOR, 'justina-ventana.js', 'app.js'], flotante: true },
+  'justina-incrustada': { scripts: [...BASE_MOTOR, 'justina-ventana.js', 'app.js'], flotante: false }
+};
 
 const ICONO = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 // Cabecera y pie institucionales (los mismos elementos de la página de Justina MPD).
@@ -75,7 +80,7 @@ function protoNav(current) {
 <p class="proto-bar-t" style="margin:0"><strong>Prototipo 2 · en revisión</strong><span>No es un servicio oficial ni está conectado a los sistemas del Poder Judicial.</span></p>
 <button type="button" class="proto-btn" aria-expanded="false" aria-controls="proto-panel">${ICONO('<path d="M3 6h18M3 12h18M3 18h18"></path>')}Pantallas del prototipo</button>
 <nav id="proto-panel" class="proto-panel" aria-label="Pantallas del prototipo" hidden>
-<div class="proto-head"><div><p class="proto-title">Prototipo 2 · Justina MPD</p><p class="proto-note">Textos provisionales. Las respuestas del chat son predefinidas, los datos entre corchetes están por completar y las cifras del panel son ficticias.</p></div><button type="button" class="proto-close" aria-label="Cerrar">×</button></div>
+<div class="proto-head"><div><p class="proto-title">Prototipo 2 · Justina MPD</p><p class="proto-note">Textos provisionales. El chat responde con textos predefinidos hasta que el Ministerio habilite la conexión. Los datos entre corchetes están por completar y las cifras del panel son ficticias.</p></div><button type="button" class="proto-close" aria-label="Cerrar">×</button></div>
 <div class="proto-list">
 ${items}</div>
 </nav>
@@ -106,12 +111,12 @@ const pages = readdirSync(join(SRC, 'pages')).filter((f) => f.endsWith('.html'))
 for (const f of pages) {
   const name = basename(f, '.html');
   const { meta, body } = parse(join(SRC, 'pages', f));
-  const motor = MOTORES[meta.motor || 'guiada'];
+  const motor = MOTORES[meta.motor || 'justina-incrustada'];
   if (!motor) throw new Error(`Motor desconocido en ${f}: ${meta.motor}`);
   const layout = LAYOUTS[meta.layout || 'base'];
   if (!layout) throw new Error(`Plantilla desconocida en ${f}: ${meta.layout}`);
-  const scripts = [...motor, ...(meta.scripts || '').split(',').map((s) => s.trim()).filter(Boolean)]
-    .map((s) => `<script src="assets/js/${s}" defer></script>`).join('\n');
+  const scripts = [...motor.scripts, ...(meta.scripts || '').split(',').map((s) => s.trim()).filter(Boolean)]
+    .map((s) => `<script src="assets/js/${s}"${s === 'justina-ventana.js' && !motor.flotante ? ' data-flotante="no"' : ''} defer></script>`).join('\n');
   const main = fill(body, {
     panelSide: meta.panel ? panelNav(meta.panel, meta.who) : '',
     siteHead: siteHead(meta.kicker),

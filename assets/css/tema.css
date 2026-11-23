@@ -65,3 +65,8 @@ body.rv-active mpd-justina{--mpd-lift:62px}
 
 /* En modo revisión los diálogos de la página se abren sin bloquearla, para poder comentarlos. */
 body.rv-active dialog.panel-modal[open]{position:fixed;inset:0;margin:auto;height:fit-content;overflow:auto;z-index:900}
+
+/* Chat oculto: en las pantallas de documentación también desaparecen los botones que lo abren. */
+.pg [data-sin-chat]{display:none}
+.justina-oculta .pg [data-sin-chat]{display:inline-flex}
+.justina-oculta .pg [data-chat]{display:none}

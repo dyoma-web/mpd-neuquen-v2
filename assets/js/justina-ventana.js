@@ -1,14 +1,29 @@
 /* ==========================================================================
-   Justina MPD · ventana de conversación autónoma
+   Justina MPD · conversación de orientación (motor único del prototipo)
+
    Instalación en cualquier sitio con una sola línea:
      <script src="https://…/assets/js/justina-ventana.js" defer></script>
-   Agrega el botón flotante y la ventana dentro de un componente aislado
-   (<mpd-justina>), sin modificar el resto de la página ni usar cookies.
-   Los botones de la página anfitriona con data-chat abren una consulta.
-   Las respuestas son predefinidas: no se conecta a ningún servidor.
+   Agrega el botón flotante y la ventana en un componente aislado (<mpd-justina>),
+   sin modificar el resto de la página ni usar cookies. Los botones de la página
+   anfitriona con data-chat abren una consulta.
+
+   Este archivo tiene tres partes:
+   1. Contenido: recorridos, directorio de oficinas, derechos y guía de documentos.
+   2. Clasificador de preguntas escritas (por palabras clave) y mensajes de urgencia.
+   3. Interfaz, visibilidad y conector genérico para una plataforma de consulta (RAG).
+
+   Configuración (opcional), antes de cargar este archivo:
+     window.JUSTINA_CONFIG = {
+       visible: true,                 // false oculta el chat y los botones que lo abren
+       modo: 'demostracion',          // 'conectado' envía las preguntas escritas al conector
+       conector: { url: '/api/chat', estadoUrl: '/api/estado' },
+       aviso: 'Texto del aviso que se muestra dentro de la ventana'
+     };
+   Con estadoUrl, la visibilidad y el modo se leen del servidor (ver conector/).
    ========================================================================== */
 (() => {
-  if (document.querySelector('mpd-justina')) return;
+  const root = typeof window !== 'undefined' ? window : globalThis;
+  if (root.JustinaMPD) return;
   const base = 'https://www.mpdneuquen.gob.ar/';
   const soj = base + 'index.php/civil/soj';
   const penal = base + 'index.php/penal/servicio-de-gestion-penal';
@@ -1038,7 +1053,6 @@
     const query = Number.isFinite(office.lat) && Number.isFinite(office.lon) ? office.lat+','+office.lon : office.street+', '+city.name+', Neuquén, Argentina';
     return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
   }
-  window.JustinaMPD = Object.freeze({cities,rights,labels,mapUrl});
   const fold = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   const mapLink = (city='',topic='') => ({url:mapOfficial,label:'Ver en el mapa de defensorías',place:{city,topic}});
   const topics = [choice('alimentos','Familia e hijos'),choice('ninez','Niñez y adolescencia'),choice('vivienda','Vivienda y alquiler'),choice('deudas','Deudas y consumo'),choice('penal','Defensa penal')];
@@ -1109,7 +1123,24 @@
   routes.ilegible.choices=[choice('mapa','Buscar una oficina'),choice('asignada','Ya tengo defensa')];
   routes.otra.links.unshift(mapLink());
   routes.desconocido.choices=[choice('temas','Elegir un tema'),choice('normas','Leer una ley'),choice('cedula','Entender un aviso'),choice('mapa','Encontrar una oficina')];
-  function directoryIntent(t) {
+
+  // Mensajes de urgencia y derivaciones que venían de la primera versión del prototipo.
+  // «pendiente» marca los textos que la Defensa todavía debe aprobar.
+  const linea = (numero, nombre) => source('tel:' + numero, 'Llamar al ' + numero + ' · ' + nombre);
+  Object.assign(routes, {
+    'urgente-violencia': {question:'Situación de violencia en curso', critica:true, pendiente:true, text:'Si estás en peligro ahora, pedí ayuda ya. Llamá al 911. Si podés, andá a un lugar seguro o con alguien de confianza.\n\nEste chat ofrece orientación automática y no recibe pedidos de emergencia.', links:[linea('911','Emergencias'), linea('144','Violencia de género, las 24 horas')], choices:[choice('persona','Ver canales del MPD')]},
+    'urgente-silencio': {question:'Violencia sin poder hablar', critica:true, pendiente:true, text:'Si no podés hablar, hay otras formas de pedir ayuda. Llamá al 911 apenas puedas. La Línea 144 también atiende por mensajes escritos [canales a validar con la Defensa].\n\nSi alguien se acerca, podés cerrar esta ventana con «Finalizar y borrar».', links:[linea('911','Emergencias'), linea('144','Violencia de género, las 24 horas')]},
+    'urgente-ninez': {question:'Niña, niño o adolescente en peligro', critica:true, pendiente:true, text:'Si estás en peligro, pedí ayuda ya. Llamá al 102 o al 911. Podés hablar aunque no estés con una persona adulta, y no hace falta que digas tu nombre.\n\nSi alguien te escribe y te hace sentir mal o te pide fotos, no le respondas y contale a una persona adulta de confianza.', links:[linea('102','Niñas, niños y adolescentes'), linea('911','Emergencias')], choices:[choice('mapa-ninez','Encontrar la defensoría de niñez')]},
+    'urgente-salud': {question:'Crisis de salud mental', critica:true, pendiente:true, text:'Gracias por contarlo. No estás sola ni solo. Si pensás en hacerte daño, pedí ayuda ahora: llamá al 107 o al 911. Si podés, hablá con alguien de confianza que esté cerca.', links:[linea('107','Emergencias médicas'), linea('911','Emergencias')], choices:[choice('salud','Derechos en salud mental')]},
+    denuncia: {question:'Quiero hacer una denuncia.', text:'Las denuncias las recibe el Ministerio Público Fiscal, no la Defensa Pública. En su directorio encontrás la fiscalía de tu localidad. Si estás en peligro ahora, llamá al 911.', links:[source(fiscalia,'Directorio del Ministerio Público Fiscal'), linea('911','Emergencias')], choices:[choice('persona','Hablar con la Defensa')]},
+    laboral: {question:'Tengo un problema laboral.', pendiente:true, text:'Los reclamos laborales no son competencia de la Defensa Pública. Podés consultar en el organismo de trabajo de la provincia [contacto a validar con la Defensa]. Si no sabés adónde ir, la Defensoría General puede orientarte.', links:[source('tel:+542995255042','Defensoría General · (0299) 525 5042')], choices:[choice('temas','Ver los temas que atiende la Defensa')]},
+    acceso: {question:'¿Quién puede pedir una defensora o un defensor?', pendiente:true, text:'La Defensa Pública atiende sin costo a quienes no pueden pagar una abogada o un abogado particular. En la primera consulta, el Servicio de Orientación Jurídica escucha tu situación y evalúa si corresponde asignarte una defensa. En materia penal, toda persona imputada tiene derecho a una defensa.', links:[source(soj,'Servicio de Orientación Jurídica')], choices:[choice('requisitos','Qué llevar a la primera consulta'), choice('mapa-soj','Encontrar una oficina')]}
+  });
+  routes.urgente.critica = true;
+  routes.urgente.question = 'Situación de urgencia';
+  routes.urgente.links = [linea('911','Emergencias')];
+  const esUrgencia = id => String(id).startsWith('urgente');
+  function directoryIntent(t, previousRoute) {
     const town=cities.find(city=>new RegExp('\\b'+fold(city.name)+'\\b').test(t));
     const onMap= /\b(?:mapa|sede|sedes|direccion|horarios?|ubicacion|telefono|oficinas?)\b|donde (?:queda|esta|atiend)|como (?:llegar|llego)/.test(t);
     const fromChoice=previousRoute.startsWith('mapa-') ? previousRoute.slice(5) : '';
@@ -1120,120 +1151,26 @@
     if(onMap) return category?'mapa-'+category:'mapa';
     return '';
   }
-  const actionIcon = {
-    chat:'<path d="M21 11a8 8 0 0 1-8 8H7l-4 3V11a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z"/><path d="M7.5 11h.1m4.4 0h.1m4.4 0h.1" stroke-width="2.6"/>',
-    minus:'<path d="M5 12h14"/>',send:'<path d="m3 3 18 9-18 9 4-9-4-9Zm4 9h14"/>',shield:'<path d="m12 2 8 3v6c0 5-4 9-8 11-4-2-8-6-8-11V5Z"/><path d="m8.5 12 2.5 2.5 5-5"/>',
-    close:'<path d="m6 6 12 12M18 6 6 18"/>',user:'<circle cx="12" cy="8" r="3.3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>'
-  };
-  const icon = key => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+actionIcon[key]+'</svg>';
-  const host = document.createElement('mpd-justina');
-  document.body.append(host);
-  const shadow = host.attachShadow({mode:'open'});
-  shadow.innerHTML = `<style>
-    :host{--jw:#174e63;--paper:white;--ink:#1c3643;--muted:#465e6a;--edge:#c8d7de;color:var(--ink);font:1rem/1.5 "Open Sans",Arial,sans-serif}*{box-sizing:border-box}button,input{font:inherit}button{cursor:pointer;color:inherit}button,a,input{outline-offset:3px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #bd7117}svg{width:1.3em;height:1.3em;flex-shrink:0}button{border:0}a{color:#0e5470;text-underline-offset:3px}button:hover{filter:brightness(.95)}[hidden]{display:none!important}
-    .launch{position:fixed;z-index:105;bottom:calc(20px + var(--mpd-lift,0px));right:23px;display:flex;align-items:center;gap:10px;border-radius:30px;padding:12px 20px;background:var(--jw);color:white;border:1px solid #ffffff75;box-shadow:0 4px 16px #173d342d;font-weight:700;min-height:49px;font-size:.96rem}.launch svg{width:22px;height:22px}
-    .panel{position:fixed;right:23px;bottom:calc(83px + var(--mpd-lift,0px));width:min(399px,calc(100vw - 28px));height:min(595px,calc(100dvh - 110px - var(--mpd-lift,0px)));max-height:100dvh;border:1px solid var(--edge);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;z-index:106;background:var(--paper);box-shadow:0 10px 45px #133b3038;font-size:.925rem;line-height:1.5;overflow-wrap:anywhere}
-    header{display:flex;gap:11px;align-items:center;padding:15px 16px;color:white;background:var(--jw)}.mark{width:39px;height:39px;display:grid;place-items:center;border:1px solid #80a8bb;border-radius:12px;background:#245d74}.mark svg{width:24px;height:24px}header strong{font:700 1.25rem/1.2 Roboto,Arial,sans-serif;display:block}header small{font-size:.76rem;display:block;color:#f3f7f3;margin-top:3px}.row-icons{display:flex;gap:2px;margin-left:auto}.ib{width:33px;height:34px;display:grid;place-items:center;background:transparent;color:white;border-radius:6px}.ib:hover{background:#276880}
-    .tools{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:7px 14px;border-bottom:1px solid var(--edge);background:#f3f7f9}.tools button,.end button{background:none;border:0;padding:5px 3px;color:var(--jw);font-weight:600;font-size:.8rem}.tools button{display:flex;align-items:center;gap:5px}.tools svg{width:16px}.history{overflow-y:auto;flex:1;min-height:40px;padding:17px 14px;overscroll-behavior:contain}.msg{max-width:96%;margin-bottom:14px}.speaker{display:block;font-size:.71rem;font-weight:700;letter-spacing:.035em;color:var(--muted);margin:0 4px 4px}.bubble{padding:12px 14px;border:1px solid #dfe9e3;border-radius:0 12px 12px;background:#eff5f7}.msg.mine{margin-left:auto;width:fit-content}.mine .speaker{text-align:right}.mine .bubble{background:var(--jw);color:white;border:0;border-radius:12px 0 12px 12px}.bubble{white-space:pre-line}.map-action{justify-self:start;text-align:left;padding:0;color:#0e5470;background:none;text-decoration:underline;font-size:.88rem;font-weight:600}.refs{display:grid;gap:8px;margin-top:10px}.refs a{font-size:.88rem;font-weight:600}.picks{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.picks button{min-height:35px;text-align:left;background:#fff;border:1px solid #9bb6c3;color:#124e67;border-radius:13px;padding:5px 11px;font-weight:600;font-size:.84rem}.picks button:hover{background:#e1edf3}
-    .entry{padding:10px 14px 11px;border-top:1px solid var(--edge)}.compose{display:flex;gap:7px}input{width:100%;min-width:0;flex:1;height:42px;border:1px solid #a1b6c0;border-radius:8px;background:#fff;color:#1c3947;padding:7px 11px;font-size:1rem}input::placeholder{color:#4f6370}.send{width:42px;display:grid;place-items:center;border-radius:8px;color:#fff;background:var(--jw)}.send:disabled{background:#596f79}.privacy{display:flex;gap:6px;align-items:center;margin-top:6px;font-size:.74rem;color:var(--muted)}.privacy svg{width:14px;height:14px;flex:none}.privacy-info{background:transparent;color:var(--jw);text-decoration:underline;text-underline-offset:2px;font:inherit;font-weight:600;padding:4px}.privacy-info:hover{text-decoration-thickness:2px}.sr{position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden}.end{background:#fff7e6;color:#382e15;border-bottom:1px solid #d4bf90;padding:10px 15px}.end p{margin:0}.end button{text-decoration:underline;margin-right:12px}.end button:first-of-type{color:#71420e}
-    :host-context(.high-contrast) .bubble,:host-context(.high-contrast) .tools{background:white;color:black;border-color:#26372b}:host-context(.high-contrast) .mine .bubble{background:#002e25;color:white}:host-context(.high-contrast){--jw:#002e25;--muted:#111;--edge:#435a4d}:host-context(.more-space){letter-spacing:.05em;word-spacing:.1em}
-    @media(max-width:600px){.launch{right:12px;bottom:calc(15px + var(--mpd-lift,0px));padding:10px 16px;min-height:45px}.panel{right:8px;bottom:9px;width:calc(100vw - 16px);height:min(585px,calc(100dvh - 18px));z-index:110}.panel:not([hidden])~.launch{visibility:hidden}.entry{padding-bottom:max(11px,env(safe-area-inset-bottom))}}
-    @media(max-height:450px){.panel{bottom:4px;right:4px;height:calc(100dvh - 8px);max-width:calc(100vw - 8px)}header{padding:7px 12px}.tools{padding:3px 10px}.entry{padding:5px 10px}.privacy{margin-top:3px}}
-    </style><section hidden class="panel" role="dialog" aria-label="Conversación con Justina MPD"><header><span class="mark">${icon('chat')}</span><div><strong>Justina MPD</strong><small>Orientación de la Defensa Pública</small></div><div class="row-icons"><button type="button" class="ib minimize" title="Minimizar conversación" aria-label="Minimizar conversación">${icon('minus')}</button></div></header><div class="tools"><button type="button" class="human">${icon('user')} Atención personal</button><button type="button" class="finish">Finalizar y borrar</button></div><div hidden class="end" role="group" aria-label="Confirmar fin de conversación"><p>¿Querés borrar esta conversación?</p><button class="confirm" type="button">Finalizar y borrar</button><button type="button" class="cancel">Continuar</button></div><div class="history" role="log" aria-label="Conversación" aria-live="polite" aria-relevant="additions" tabindex="0"></div><form class="entry" autocomplete="off"><div class="compose"><label class="sr" for="mpd-input">Escribí tu pregunta</label><input id="mpd-input" aria-describedby="privacy-hint" maxlength="400" placeholder="Escribí tu pregunta…" autocomplete="off" spellcheck="false"><button class="send" type="submit" aria-label="Enviar consulta" disabled>${icon('send')}</button></div><div class="privacy">${icon('shield')}<span id="privacy-hint">Evitá incluir datos personales.</span> <button class="privacy-info" type="button">Privacidad</button></div></form></section><button class="launch" type="button" aria-expanded="false" aria-label="Abrir conversación con Justina MPD">${icon('chat')}<span>Justina MPD</span></button>`;
-  const get = cls => shadow.querySelector(cls);
-  const panel = get('.panel'), history = get('.history'), input = get('input'), launcher = get('.launch');
-  let opener = launcher;
-  let previousRoute = '';
-  function message(label, content, mine=false) {
-    const msg = document.createElement('div');
-    msg.className = 'msg' + (mine ? ' mine' : '');
-    const speaker = document.createElement('span');
-    speaker.className = 'speaker';
-    speaker.textContent = label;
-    const box = document.createElement('div');
-    box.className = 'bubble';
-    box.textContent = content;
-    msg.append(speaker, box);
-    history.append(msg);
-    return {msg,box};
-  }
-  function answer(route) {
-    const {msg,box} = message('Justina MPD',route.text);
-    if (route.links) {
-      const refs = document.createElement('div');
-      refs.className = 'refs';
-      for (const {url,label,place} of route.links) {
-        if (place && document.getElementById('places-title')) {
-          const visit=document.createElement('button');
-          visit.className='map-action';
-          visit.textContent=label;
-          visit.addEventListener('click',()=>{
-            minimize();
-            window.dispatchEvent(new CustomEvent('justina-mpd:mapa',{detail:place}));
-          });
-          refs.append(visit);
-          continue;
-        }
-        const link = document.createElement('a');
-        link.href = url;
-        link.textContent = label;
-        if (url.startsWith('https:')) { link.target='_blank'; link.rel='noopener noreferrer'; }
-        refs.append(link);
-      }
-      box.append(refs);
-    }
-    if (route.choices) {
-      const picks = document.createElement('div');
-      picks.className = 'picks';
-      for (const {id,label} of route.choices) {
-        const pick = document.createElement('button');
-        pick.type = 'button';
-        pick.textContent = label;
-        pick.addEventListener('click', () => selectRoute(id, label, true));
-        picks.append(pick);
-      }
-      msg.append(picks);
-    }
-    history.scrollTop = msg.offsetTop - history.offsetTop;
-  }
-  function selectRoute(id, display, focusReply=false) {
-    if (!Object.hasOwn(routes,id)) id='desconocido';
-    get('.end').hidden=true;
-    const route=routes[id];
-    message('Vos',display || route.question || 'Consulta general',true);
-    answer(route);
-    previousRoute = id;
-    if (focusReply) history.focus({preventScroll:true});
-  }
-  function openChat(id='', trigger=launcher) {
-    if (panel.hidden) opener=trigger;
-    panel.hidden = false;
-    launcher.setAttribute('aria-expanded','true');
-    launcher.setAttribute('aria-label','Minimizar conversación con Justina MPD');
-    if (!history.children.length) answer({text:'Hola, soy Justina MPD. ¿Qué necesitás saber? Podés elegir un tema o escribir una pregunta.',choices:hello});
-    if (id && Object.hasOwn(routes,id)) selectRoute(id);
-    get('.minimize').focus({preventScroll:true});
-  }
-  function minimize() {
-    panel.hidden = true;
-    get('.end').hidden = true;
-    launcher.setAttribute('aria-expanded','false');
-    launcher.setAttribute('aria-label','Abrir conversación con Justina MPD');
-    if (!opener.isConnected || !opener.getClientRects().length) opener=launcher;
-    opener.focus({preventScroll:true});
-  }
   function containsPrivateData(text) {
     const withoutLaws = text.replace(/\b(?:ley(?: nacional| provincial)?|c[oó]digo)\s*(?:n[.°ºo]*\s*)?\d{1,3}(?:\.\d{3})?\b|\b(?:ley(?: nacional| provincial)?)\s*(?:n[.°ºo]*\s*)?\d{4,5}\b/gi, '');
     return /\S+@\S+|\d{5,}|\b\d{1,2}\.\d{3}\.\d{3}\b|\b(?:dni|expediente|legajo)\s*[:#°\d]/i.test(withoutLaws);
   }
-  function classify(messageText) {
+  function classify(messageText, previousRoute='') {
     const t=messageText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-    if (/peligro|emergencia|me esta(n)? (pegando|atacando)|me amenaza|urgencia medica/.test(t)) return 'urgente';
+    // Primero, las situaciones de riesgo: interrumpen cualquier recorrido y nunca salen del navegador.
+    const menor = /\b(tengo|tiene) (1[0-7]|[5-9]) anos\b|\bsoy (menor|chic[oa]|nen[ae])\b/.test(t);
+    const riesgo = /me escribe|me manda|me pide|fotos|videos|instagram|tiktok|whatsapp|discord|un hombre|un senor|me toca|me pega|abus|tengo miedo|me amenaza|peligro/.test(t);
+    if (menor && riesgo) return 'urgente-ninez';
+    if (/no puedo hablar|no puedo llamar|no puedo hacer ruido|me esta escuchando|me escucha|me esta mirando|me revisa el (celular|telefono)/.test(t)) return 'urgente-silencio';
+    if (/me esta(n)? (pegando|atacando|siguiendo)|me pega|me pego|me quiere matar|me va a matar|nos quiere matar|tengo miedo|me amenaza|me golpea|me golpeo/.test(t)) return 'urgente-violencia';
+    if (/matarme|me quiero matar|suicid|no quiero vivir|quitarme la vida|hacerme dano|lastimarme|no aguanto mas/.test(t)) return 'urgente-salud';
+    if (/peligro|emergencia|urgencia medica/.test(t)) return 'urgente';
     if (containsPrivateData(t)) return 'datos';
+    if (/hablar con (alguien|una persona|un humano)|no me (estas )?entend|\bhumano\b|operador|persona real/.test(t)) return 'persona';
     if (/privacidad|confidencial|datos personales|mis datos|guardan.*(datos|mensajes)|borrar (?:el |la |mi )?(?:chat|historial|conversacion)|proteccion de datos|\b(?:25\.?326|2\.?399)\b/.test(t)) return 'privacidad';
     if (/adjuntar|subir (?:un|mi|el)|foto de|\bpdf\b|\bjpg\b/.test(t)) return 'cedula';
     if (/semaforo|riesgo|orientarme por tema|elegir un tema/.test(t)) return 'temas';
-    const directory=directoryIntent(t);
+    const directory=directoryIntent(t, previousRoute);
     if(directory) return directory;
     if (/intimacion/.test(t)) return 'papel-intimacion';
     if (/citacion/.test(t)) return 'papel-citacion';
@@ -1249,51 +1186,306 @@
     if (/deuda|consumo|credito|prestamo/.test(t)) return 'deudas';
     if (/salud mental|internacion/.test(t)) return 'salud';
     if (/cedula|notificacion|notifica|intimacion|(?:recibi|llego|llegado) (?:una? )?papel/.test(t)) return 'cedula';
+    if (/denunci/.test(t)) return 'denuncia';
     if (/fiscali/.test(t)) return 'fiscal';
     if (/juzgado/.test(t) && ['cedula','organismo','mirar'].includes(previousRoute)) return 'juzgado';
     if (/expediente|ya tengo|mi (defensor|abogad)|mi causa|ya me atiende|asignad/.test(t)) return 'asignada';
-    if (/alimento|alimentaria|manutencion/.test(t)) return 'alimentos';
+    if (/alimento|alimentaria|manutencion|\bcuota\b/.test(t)) return 'alimentos';
     if (/escuela|docente/.test(t)) return 'escuela';
     if (/soy adolescente|tengo 1[3-7] a/.test(t)) return 'adolescente';
     if (/ninez|nina|nino|adolescen|derechos de mi hij/.test(t)) return 'ninez';
     if (/audiencia/.test(t)) return 'audiencia';
-    if (/penal|detencion|imputad/.test(t)) return 'penal';
+    if (/penal|detencion|detuv|detenid|imputad|comisaria|\bpres[oa]\b/.test(t)) return 'penal';
     if (/document|requisito|pauta economica/.test(t)) return 'requisitos';
     if (/sede|localidad|ubicacion|direccion|oficina cerca/.test(t)) return 'sedes';
     if (/familia|civil|soj|divorcio|vivienda|alquiler|deuda/.test(t)) return 'civil';
+    if (/despid|juicio laboral|\blaboral\b|trabajo en negro|patron|sueldo|aguinaldo|indemniz/.test(t)) return 'laboral';
+    if (/no puedo pagar|no tengo (plata|dinero)|sin plata|gratis|gratuit|cuanto (cuesta|sale)|cobran|tengo que pagar|defensor(a)? (publico|publica|oficial)|necesito un(a)? (defensor|abogad)/.test(t)) return 'acceso';
     if (/persona|turno|telefono|contact|presencial|horario|videollamada|whatsapp|lejos/.test(t)) return 'persona';
     if (/funcion|que hace|que es la defensa|rol de/.test(t)) return 'funciones';
     if (/hola|primera|empezar|buen dia|buenas/.test(t)) return 'primera';
     if (/limite|que puede|alcance|asesoramiento/.test(t)) return 'limite';
     return 'desconocido';
   }
-  get('form').addEventListener('submit',e => {
-    e.preventDefault();
-    const text = input.value.trim();
-    if (!text) return;
-    const id = classify(text);
-    selectRoute(id, id==='datos' ? 'Consulta con datos omitidos' : routes[id]?.question || 'Consulta general',true);
-    input.value='';
-    get('.send').disabled=true;
-    input.focus({preventScroll:true});
-  });
-  input.addEventListener('input',()=>get('.send').disabled=!input.value.trim());
-  get('.privacy-info').addEventListener('click', () => selectRoute('privacidad', undefined, true));
-  get('.human').addEventListener('click',()=>selectRoute('persona',undefined,true));
-  get('.minimize').addEventListener('click',minimize);
-  launcher.addEventListener('click',()=>panel.hidden?openChat():minimize());
-  get('.finish').addEventListener('click',()=>{get('.end').hidden=false;get('.cancel').focus();});
-  get('.cancel').addEventListener('click',()=>{get('.end').hidden=true;get('.finish').focus();});
-  get('.confirm').addEventListener('click',()=>{
-    history.replaceChildren();
-    previousRoute='';
-    input.value='';
-    get('.send').disabled=true;
-    minimize();
-  });
-  shadow.addEventListener('keydown',e=>{if(e.key==='Escape' && !panel.hidden){e.preventDefault();minimize();}});
+
+  const AVISO = 'Versión de demostración. La conversación con Justina MPD estará disponible cuando el Ministerio cuente con las herramientas y las autorizaciones necesarias. Mientras tanto, responde con textos predefinidos.';
+  const api = root.JustinaMPD = {cities, rights, labels, subjects, documents, routes, hello, mapUrl, classify, esUrgencia, version: '2.1'};
+  // Sin navegador (por ejemplo, en el banco de pruebas de Node) solo se expone el contenido y el clasificador.
+  if (!root.document || !root.document.createElement) return;
+
+  /* ---------- Configuración, visibilidad y conector ---------- */
+  const script = document.currentScript;
+  const propia = root.JUSTINA_CONFIG || {};
+  const cfg = Object.assign({visible:true, modo:'demostracion', flotante:true, vistaPrevia:false, aviso:AVISO}, propia);
+  cfg.conector = Object.assign({url:'', estadoUrl:'', esperaMs:30000, maxMensajes:10, maxCaracteres:2000}, propia.conector || {});
+  if (script) {
+    const d = script.dataset;
+    if (d.flotante === 'no') cfg.flotante = false;
+    if (d.visible) cfg.visible = d.visible !== 'no' && d.visible !== 'false';
+    if (d.conector) { cfg.conector.url = d.conector; cfg.modo = 'conectado'; }
+    if (d.estado) cfg.conector.estadoUrl = d.estado;
+  }
+  // Solo en el prototipo: permite ver el sitio con el chat oculto (?chat=oculto) o usar el interruptor del panel.
+  if (cfg.vistaPrevia) {
+    try {
+      const pedido = new URLSearchParams(location.search).get('chat');
+      const guardado = localStorage.getItem('justina-mpd:visible');
+      if (pedido === 'oculto' || pedido === 'visible') cfg.visible = pedido === 'visible';
+      else if (guardado === '0' || guardado === '1') cfg.visible = guardado === '1';
+    } catch (e) { /* sin almacenamiento local */ }
+  }
+  const conectado = () => cfg.modo === 'conectado' && !!cfg.conector.url;
+  api.config = cfg;
+
+  // Conector genérico: la página nunca habla con la plataforma de consulta ni conoce su clave.
+  // Envía la conversación al intermediario del propio dominio y espera { reply, sources? }.
+  async function consultar(mensajes) {
+    const control = new AbortController();
+    const reloj = setTimeout(() => control.abort(), cfg.conector.esperaMs);
+    try {
+      const respuesta = await fetch(cfg.conector.url, {method:'POST', headers:{'Content-Type':'application/json'}, cache:'no-store', credentials:'omit', signal:control.signal,
+        body: JSON.stringify({messages: mensajes.slice(-cfg.conector.maxMensajes)})});
+      if (!respuesta.ok) throw new Error('HTTP ' + respuesta.status);
+      const datos = await respuesta.json();
+      if (!datos || typeof datos.reply !== 'string' || !datos.reply.trim()) throw new Error('Respuesta sin texto');
+      const fuentes = Array.isArray(datos.sources) ? datos.sources.filter(f => f && typeof f.label === 'string' && /^https:\/\//.test(f.url || '')).slice(0, 6) : [];
+      return {text: datos.reply.trim().slice(0, 6000), links: fuentes.map(f => source(f.url, f.label.slice(0, 160)))};
+    } finally { clearTimeout(reloj); }
+  }
+  api.consultar = consultar;
+
+  /* ---------- Interfaz ---------- */
+  const actionIcon = {
+    chat:'<path d="M21 11a8 8 0 0 1-8 8H7l-4 3V11a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z"/><path d="M7.5 11h.1m4.4 0h.1m4.4 0h.1" stroke-width="2.6"/>',
+    minus:'<path d="M5 12h14"/>',send:'<path d="m3 3 18 9-18 9 4-9-4-9Zm4 9h14"/>',shield:'<path d="m12 2 8 3v6c0 5-4 9-8 11-4-2-8-6-8-11V5Z"/><path d="m8.5 12 2.5 2.5 5-5"/>',
+    close:'<path d="m6 6 12 12M18 6 6 18"/>',user:'<circle cx="12" cy="8" r="3.3"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>'
+  };
+  const icon = key => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+actionIcon[key]+'</svg>';
+  const PLANTILLA = `<style>
+    :host{--jw:#174e63;--paper:white;--ink:#1c3643;--muted:#465e6a;--edge:#c8d7de;color:var(--ink);font:1rem/1.5 "Open Sans",Arial,sans-serif}*{box-sizing:border-box}button,input{font:inherit}button{cursor:pointer;color:inherit}button,a,input{outline-offset:3px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #bd7117}svg{width:1.3em;height:1.3em;flex-shrink:0}button{border:0}a{color:#0e5470;text-underline-offset:3px}button:hover{filter:brightness(.95)}[hidden]{display:none!important}
+    .launch{position:fixed;z-index:105;bottom:calc(20px + var(--mpd-lift,0px));right:23px;display:flex;align-items:center;gap:10px;border-radius:30px;padding:12px 20px;background:var(--jw);color:white;border:1px solid #ffffff75;box-shadow:0 4px 16px #173d342d;font-weight:700;min-height:49px;font-size:.96rem}.launch svg{width:22px;height:22px}
+    .panel{position:fixed;right:23px;bottom:calc(83px + var(--mpd-lift,0px));width:min(399px,calc(100vw - 28px));height:min(595px,calc(100dvh - 110px - var(--mpd-lift,0px)));max-height:100dvh;border:1px solid var(--edge);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;z-index:106;background:var(--paper);box-shadow:0 10px 45px #133b3038;font-size:.925rem;line-height:1.5;overflow-wrap:anywhere}
+    header{display:flex;gap:11px;align-items:center;padding:15px 16px;color:white;background:var(--jw)}.mark{width:39px;height:39px;display:grid;place-items:center;border:1px solid #80a8bb;border-radius:12px;background:#245d74}.mark svg{width:24px;height:24px}header strong{font:700 1.25rem/1.2 Roboto,Arial,sans-serif;display:block}header small{font-size:.76rem;display:block;color:#f3f7f3;margin-top:3px}.row-icons{display:flex;gap:2px;margin-left:auto}.ib{width:33px;height:34px;display:grid;place-items:center;background:transparent;color:white;border-radius:6px}.ib:hover{background:#276880}
+    .tools{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:7px 14px;border-bottom:1px solid var(--edge);background:#f3f7f9}.tools button,.end button{background:none;border:0;padding:5px 3px;color:var(--jw);font-weight:600;font-size:.8rem}.tools button{display:flex;align-items:center;gap:5px}.tools svg{width:16px}.history{overflow-y:auto;flex:1;min-height:40px;padding:17px 14px;overscroll-behavior:contain}.msg{max-width:96%;margin-bottom:14px}.speaker{display:block;font-size:.71rem;font-weight:700;letter-spacing:.035em;color:var(--muted);margin:0 4px 4px}.bubble{padding:12px 14px;border:1px solid #dfe9e3;border-radius:0 12px 12px;background:#eff5f7}.msg.mine{margin-left:auto;width:fit-content}.mine .speaker{text-align:right}.mine .bubble{background:var(--jw);color:white;border:0;border-radius:12px 0 12px 12px}.bubble{white-space:pre-line}.map-action{justify-self:start;text-align:left;padding:0;color:#0e5470;background:none;text-decoration:underline;font-size:.88rem;font-weight:600}.refs{display:grid;gap:8px;margin-top:10px}.refs a{font-size:.88rem;font-weight:600}.picks{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.picks button{min-height:35px;text-align:left;background:#fff;border:1px solid #9bb6c3;color:#124e67;border-radius:13px;padding:5px 11px;font-weight:600;font-size:.84rem}.picks button:hover{background:#e1edf3}
+    .entry{padding:10px 14px 11px;border-top:1px solid var(--edge)}.compose{display:flex;gap:7px}input{width:100%;min-width:0;flex:1;height:42px;border:1px solid #a1b6c0;border-radius:8px;background:#fff;color:#1c3947;padding:7px 11px;font-size:1rem}input::placeholder{color:#4f6370}.send{width:42px;display:grid;place-items:center;border-radius:8px;color:#fff;background:var(--jw)}.send:disabled{background:#596f79}.privacy{display:flex;gap:6px;align-items:center;margin-top:6px;font-size:.74rem;color:var(--muted)}.privacy svg{width:14px;height:14px;flex:none}.privacy-info{background:transparent;color:var(--jw);text-decoration:underline;text-underline-offset:2px;font:inherit;font-weight:600;padding:4px}.privacy-info:hover{text-decoration-thickness:2px}.sr{position:absolute;clip-path:inset(50%);width:1px;height:1px;overflow:hidden}.end{background:#fff7e6;color:#382e15;border-bottom:1px solid #d4bf90;padding:10px 15px}.end p{margin:0}.end button{text-decoration:underline;margin-right:12px}.end button:first-of-type{color:#71420e}
+    :host-context(.high-contrast) .bubble,:host-context(.high-contrast) .tools{background:white;color:black;border-color:#26372b}:host-context(.high-contrast) .mine .bubble{background:#002e25;color:white}:host-context(.high-contrast){--jw:#002e25;--muted:#111;--edge:#435a4d}:host-context(.more-space){letter-spacing:.05em;word-spacing:.1em}
+    @media(max-width:600px){.launch{right:12px;bottom:calc(15px + var(--mpd-lift,0px));padding:10px 16px;min-height:45px}.panel{right:8px;bottom:9px;width:calc(100vw - 16px);height:min(585px,calc(100dvh - 18px));z-index:110}.panel:not([hidden])~.launch{visibility:hidden}.entry{padding-bottom:max(11px,env(safe-area-inset-bottom))}}
+    @media(max-height:450px){.panel{bottom:4px;right:4px;height:calc(100dvh - 8px);max-width:calc(100vw - 8px)}header{padding:7px 12px}.tools{padding:3px 10px}.entry{padding:5px 10px}.privacy{margin-top:3px}}
+    .notice{margin:0;padding:8px 14px;background:#fff7e6;color:#382e15;border-bottom:1px solid #d4bf90;font-size:.78rem;line-height:1.4}
+    .msg.crit .bubble{background:#fff7e6;border-color:#d4bf90;color:#382e15}.msg.crit .refs a{font-size:1rem}
+    .typing{font-style:italic;color:var(--muted)}
+    :host([inline]){display:block;height:100%}:host([inline]) .panel{position:static;width:100%;height:100%;max-height:none;border:0;border-radius:0;box-shadow:none}:host([inline]) .launch,:host([inline]) .minimize{display:none}
+    </style><section hidden class="panel" role="dialog" aria-label="Conversación con Justina MPD"><header><span class="mark">${icon('chat')}</span><div><strong>Justina MPD</strong><small>Orientación de la Defensa Pública</small></div><div class="row-icons"><button type="button" class="ib minimize" title="Minimizar conversación" aria-label="Minimizar conversación">${icon('minus')}</button></div></header><div class="tools"><button type="button" class="human">${icon('user')} Atención personal</button><button type="button" class="finish">Finalizar y borrar</button></div><p class="notice" hidden></p><div hidden class="end" role="group" aria-label="Confirmar fin de conversación"><p>¿Querés borrar esta conversación?</p><button class="confirm" type="button">Finalizar y borrar</button><button type="button" class="cancel">Continuar</button></div><div class="history" role="log" aria-label="Conversación" aria-live="polite" aria-relevant="additions" tabindex="0"></div><form class="entry" autocomplete="off"><div class="compose"><label class="sr" for="mpd-input">Escribí tu pregunta</label><input id="mpd-input" aria-describedby="privacy-hint" maxlength="400" placeholder="Escribí tu pregunta…" autocomplete="off" spellcheck="false"><button class="send" type="submit" aria-label="Enviar consulta" disabled>${icon('send')}</button></div><div class="privacy">${icon('shield')}<span id="privacy-hint">Evitá incluir datos personales.</span> <button class="privacy-info" type="button">Privacidad</button></div></form></section><button class="launch" type="button" aria-expanded="false" aria-label="Abrir conversación con Justina MPD">${icon('chat')}<span>Justina MPD</span></button>`;
+
+  function createChat(opts = {}) {
+    const inline = !!opts.inline;
+    const host = document.createElement(inline ? 'div' : 'mpd-justina');
+    if (inline) host.setAttribute('inline', '');
+    (opts.container || document.body).append(host);
+    const shadow = host.attachShadow({mode:'open'});
+    shadow.innerHTML = PLANTILLA;
+    const get = cls => shadow.querySelector(cls);
+    const panel = get('.panel'), history = get('.history'), input = get('input'), launcher = get('.launch');
+    let opener = launcher;
+    let previousRoute = '';
+    let transcript = [];
+    const aviso = get('.notice');
+    function pintarAviso() {
+      const texto = conectado() ? '' : cfg.aviso;
+      aviso.textContent = texto || '';
+      aviso.hidden = !texto;
+    }
+    pintarAviso();
+    function message(label, content, mine=false) {
+      const msg = document.createElement('div');
+      msg.className = 'msg' + (mine ? ' mine' : '');
+      const speaker = document.createElement('span');
+      speaker.className = 'speaker';
+      speaker.textContent = label;
+      const box = document.createElement('div');
+      box.className = 'bubble';
+      box.textContent = content;
+      msg.append(speaker, box);
+      history.append(msg);
+      return {msg,box};
+    }
+    function answer(route) {
+      const {msg,box} = message('Justina MPD',route.text);
+      if (route.critica) { msg.classList.add('crit'); msg.setAttribute('role','alert'); }
+      if (route.links && route.links.length) {
+        const refs = document.createElement('div');
+        refs.className = 'refs';
+        for (const {url,label,place} of route.links) {
+          if (place && !inline && document.getElementById('places-title')) {
+            const visit=document.createElement('button');
+            visit.className='map-action';
+            visit.type='button';
+            visit.textContent=label;
+            visit.addEventListener('click',()=>{
+              minimize();
+              window.dispatchEvent(new CustomEvent('justina-mpd:mapa',{detail:place}));
+            });
+            refs.append(visit);
+            continue;
+          }
+          const link = document.createElement('a');
+          link.href = url;
+          link.textContent = label;
+          if (url.startsWith('https:')) { link.target='_blank'; link.rel='noopener noreferrer'; }
+          refs.append(link);
+        }
+        box.append(refs);
+      }
+      if (route.choices) {
+        const picks = document.createElement('div');
+        picks.className = 'picks';
+        for (const {id,label} of route.choices) {
+          const pick = document.createElement('button');
+          pick.type = 'button';
+          pick.textContent = label;
+          pick.addEventListener('click', () => selectRoute(id, label, true));
+          picks.append(pick);
+        }
+        msg.append(picks);
+      }
+      history.scrollTop = msg.offsetTop - history.offsetTop;
+    }
+    function selectRoute(id, display, focusReply=false) {
+      if (!Object.hasOwn(routes,id)) id='desconocido';
+      get('.end').hidden=true;
+      const route=routes[id];
+      message('Vos',display || route.question || 'Consulta general',true);
+      answer(route);
+      previousRoute = id;
+      if (focusReply && !inline) history.focus({preventScroll:true});
+    }
+    function saludar() {
+      if (!history.children.length) answer({text:'Hola, soy Justina MPD. ¿Qué necesitás saber? Podés elegir un tema o escribir una pregunta.',choices:hello});
+    }
+    function openChat(id='', trigger=launcher) {
+      if (panel.hidden) opener=trigger;
+      panel.hidden = false;
+      launcher.setAttribute('aria-expanded','true');
+      launcher.setAttribute('aria-label','Minimizar conversación con Justina MPD');
+      saludar();
+      if (id && Object.hasOwn(routes,id)) selectRoute(id);
+      if (!inline) get('.minimize').focus({preventScroll:true});
+    }
+    function minimize() {
+      if (inline) return;
+      panel.hidden = true;
+      get('.end').hidden = true;
+      launcher.setAttribute('aria-expanded','false');
+      launcher.setAttribute('aria-label','Abrir conversación con Justina MPD');
+      if (!opener.isConnected || !opener.getClientRects().length) opener=launcher;
+      opener.focus({preventScroll:true});
+    }
+    // Pregunta escrita: las urgencias y los datos personales se resuelven siempre en el navegador.
+    async function preguntar(text) {
+      const id = classify(text, previousRoute);
+      if (!conectado() || esUrgencia(id) || id === 'datos') {
+        selectRoute(id, id==='datos' ? 'Consulta con datos omitidos' : routes[id]?.question || 'Consulta general', !inline);
+        return id;
+      }
+      get('.end').hidden = true;
+      message('Vos', text, true);
+      transcript.push({role:'user', content:text.slice(0, cfg.conector.maxCaracteres)});
+      const espera = message('Justina MPD', 'Buscando la respuesta…');
+      espera.box.classList.add('typing');
+      try {
+        const respuesta = await consultar(transcript);
+        espera.msg.remove();
+        transcript.push({role:'assistant', content:respuesta.text});
+        answer({text:respuesta.text, links:respuesta.links, choices:[choice('persona','Atención personal')]});
+      } catch (error) {
+        espera.msg.remove();
+        transcript.pop();
+        answer({text:'En este momento no puedo consultar el servicio. Te muestro la orientación disponible.'});
+        answer(routes[Object.hasOwn(routes,id) ? id : 'desconocido']);
+      }
+      previousRoute = id;
+      return id;
+    }
+    get('form').addEventListener('submit',e => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      preguntar(text);
+      input.value='';
+      get('.send').disabled=true;
+      if (!inline) input.focus({preventScroll:true});
+    });
+    input.addEventListener('input',()=>get('.send').disabled=!input.value.trim());
+    get('.privacy-info').addEventListener('click', () => selectRoute('privacidad', undefined, true));
+    get('.human').addEventListener('click',()=>selectRoute('persona',undefined,true));
+    get('.minimize').addEventListener('click',minimize);
+    launcher.addEventListener('click',()=>panel.hidden?openChat():minimize());
+    get('.finish').addEventListener('click',()=>{get('.end').hidden=false;get('.cancel').focus();});
+    get('.cancel').addEventListener('click',()=>{get('.end').hidden=true;get('.finish').focus();});
+    get('.confirm').addEventListener('click',()=>{
+      history.replaceChildren();
+      previousRoute='';
+      transcript=[];
+      input.value='';
+      get('.send').disabled=true;
+      get('.end').hidden=true;
+      if (inline) saludar(); else minimize();
+    });
+    shadow.addEventListener('keydown',e=>{if(e.key==='Escape' && !panel.hidden && !inline){e.preventDefault();minimize();}});
+    function reiniciar(inicio, texto) {
+      history.replaceChildren();
+      previousRoute='';
+      transcript=[];
+      saludar();
+      if (inicio && Object.hasOwn(routes, inicio)) selectRoute(inicio);
+      if (texto) preguntar(texto);
+    }
+    if (inline) {
+      panel.hidden = false;
+      reiniciar(opts.start, opts.texto);
+      // Muestra el momento que se quiere revisar: la consulta y su respuesta.
+      const consulta = [...history.querySelectorAll('.msg.mine')].pop();
+      history.scrollTop = consulta ? consulta.offsetTop - history.offsetTop - 8 : 0;
+    }
+    return {host, open:openChat, minimize, preguntar, selectRoute, pintarAviso, reiniciar};
+  }
+
+  /* ---------- Ventana flotante y visibilidad ---------- */
+  const instancias = [];
+  let flotante = null;
+  // El texto de privacidad del chat depende de si las preguntas salen o no del navegador.
+  const privacidadLocal = routes.privacidad.text;
+  const privacidadConectada = 'Podés usar Justina MPD sin identificarte. Los botones funcionan en esta pestaña. Cuando escribís una pregunta, el texto se envía al servicio de consulta del Ministerio para elaborar la respuesta. Los mensajes con señales de urgencia o con datos personales no se envían.\n\nPara borrar la conversación de la pantalla, elegí «Finalizar y borrar» y confirmá.' + privacidadLocal.slice(privacidadLocal.indexOf('\n\n'));
+  function setVisible(valor) {
+    cfg.visible = !!valor;
+    routes.privacidad.text = conectado() ? privacidadConectada : privacidadLocal;
+    document.documentElement.classList.toggle('justina-oculta', !cfg.visible);
+    document.documentElement.classList.toggle('justina-conectada', conectado());
+    if (cfg.visible && cfg.flotante && !flotante) { flotante = createChat(); instancias.push(flotante); }
+    if (flotante) { if (!cfg.visible) flotante.minimize(); flotante.host.hidden = !cfg.visible; }
+    instancias.forEach(chat => chat.pintarAviso());
+    window.dispatchEvent(new CustomEvent('justina-mpd:estado', {detail:{visible:cfg.visible, modo:conectado() ? 'conectado' : 'demostracion'}}));
+  }
+  api.setVisible = setVisible;
+  api.isVisible = () => cfg.visible;
+  api.mount = (container, opciones = {}) => { const chat = createChat(Object.assign({inline:true, container}, opciones)); instancias.push(chat); return chat; };
+  setVisible(cfg.visible);
+  // Con estadoUrl, el servidor decide si el chat se muestra y si está conectado.
+  if (cfg.conector.estadoUrl) {
+    fetch(cfg.conector.estadoUrl, {cache:'no-store', credentials:'omit'}).then(r => r.ok ? r.json() : null).then(estado => {
+      if (!estado) return;
+      if (estado.modo === 'conectado' || estado.modo === 'demostracion') cfg.modo = estado.modo;
+      if (typeof estado.visible === 'boolean') cfg.visible = estado.visible;
+      setVisible(cfg.visible);
+      instancias.forEach(chat => chat.pintarAviso());
+    }).catch(() => { /* sin servidor: queda la configuración local */ });
+  }
   document.addEventListener('click',e=>{
     const trigger=e.target.closest?.('[data-chat]');
-    if(trigger) openChat(trigger.dataset.chat,trigger);
+    if(trigger && cfg.visible && flotante) flotante.open(trigger.dataset.chat,trigger);
   });
+  // Conversaciones incrustadas en la página (pantallas de documentación y panel).
+  for (const el of document.querySelectorAll('[data-justina-inline]')) {
+    api.mount(el, {start: el.dataset.justinaInline, texto: el.dataset.texto});
+  }
 })();
